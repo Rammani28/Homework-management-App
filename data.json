@@ -1,0 +1,61 @@
+{
+    "homework": {
+        "science": {
+            "description": "living things",
+            "due": "tomorrow",
+            "completed": false,
+            "id": 120
+        },
+        "social": {
+            "description": "today",
+            "due": "july",
+            "completed": false,
+            "id": 121
+        },
+        " ": {
+            "description": "  ",
+            "due": " ",
+            "completed": false,
+            "id": 122
+        },
+        "   ": {
+            "description": "   ",
+            "due": "h",
+            "completed": false,
+            "id": 131
+        },
+        "FAS FDSA": {
+            "description": "FSA ASDF",
+            "due": "ASDF",
+            "completed": false,
+            "id": 132
+        },
+        "YoUtUbE": {
+            "description": "yT mA vIdEo HeRnE",
+            "due": "TONIGHT",
+            "completed": false,
+            "id": 133
+        },
+        "dsfa ": {
+            "description": "fsadf ",
+            "due": "fsdaf",
+            "completed": false,
+            "id": 134
+        },
+        "sub1": {
+            "description": "sub1  ko name lai copy ma lekhne ra teslai feri book bata copy naherikan sarera sir lai bujaune",
+            "due": "tonight",
+            "completed": false,
+            "id": 136
+        },
+        "sdf": {
+            "description": "sadf",
+            "due": "sadf",
+            "completed": false,
+            "id": 137
+        }
+    },
+    "todo": {},
+    "notes": {},
+    "completed_hw": {}
+}
