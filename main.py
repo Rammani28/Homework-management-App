@@ -100,7 +100,7 @@ def save_hw():
         whole_json_data['homework'].update(new_homework)
         with open("data.json", mode='w') as write_file:
             json.dump(whole_json_data, write_file, indent=4)
-    
+        
         messagebox.showinfo(title='Homework Added', message="Homework has been added! ")
         messagebox.Message(notebook)
         hw_due_entry.delete(0, END)
@@ -118,18 +118,19 @@ def save_todo():
     todo_create_button.configure(state='normal')
     new_todo = Todo()
     todo_create_button.configure(state='normal')
-
+    
     with open("todo_id.txt", mode='w') as todo_id_file:
         new_todo.id = todo_id_file.write(f'{todo_id}')
-        
+    
     new_todo.title = todo_title_entry.get()
     new_todo.content = todo_content_entry.get(index1=1.0, index2="end")
     new_todo.id = todo_id
     
     todo_to_be_saved = {
-        "title": new_todo.title,
-        "description": new_todo.content,
-        "id": new_todo.id
+        f"{new_todo.title}": {
+            "description": new_todo.content,
+            "id": new_todo.id,
+        }
     }
     
     field_is_empty = len(new_todo.title) == 0 or len(new_todo.content) == 0
@@ -145,8 +146,8 @@ def save_todo():
         todo_content_label.destroy()
         todo_content_entry.destroy()
         todo_save_button.destroy()
-        
-    
+
+
 # ------------------------- MANAGE THE FOUR TABS -------------------------- #
 
 def create_todo():
@@ -196,13 +197,12 @@ try:
 except FileNotFoundError:
     with open('data.json', mode='w') as file:
         file_structure = {
-                    "homework": {},
-                    "todo": {},
-                    "notes": {},
-                    "completed_hw": {}
+            "homework": {},
+            "todo": {},
+            "notes": {},
+            "completed_hw": {}
         }
         json.dump(file_structure, file, indent=4)
-
 
 # ------------------------------ UI SETUP ----------------------------------- #
 
@@ -232,7 +232,6 @@ todo_content_label = Label()
 todo_content_entry = Text()
 todo_save_button = Button()
 
-
 #  uncomment below for ugly styling
 style = ttk.Style(window)
 # style.theme_create("MyStyle", parent="alt", settings={
@@ -249,7 +248,7 @@ dash_tab, assignments_tab, notes_tab, todo_tab, hw_tab = all_tabs
 Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10).grid(row=1, column=1)
 
 # ASSIGNMENT TAB
-Button(assignments_tab, text="Create homework", font=FONT, command=lambda: add_hw_button(hw_tab))\
+Button(assignments_tab, text="Create homework", font=FONT, command=lambda: add_hw_button(hw_tab)) \
     .grid(row=0, column=4, sticky=W)
 Label(assignments_tab, text="Due Homeworks", font=("Arial", 16, "bold"), padx=10).grid(row=0, column=0)
 Label(assignments_tab, text="✔/x", padx=5, font=("Arial", 16, "bold")).grid(row=1, column=0)
