@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from todo import Todo
+from tkcalendar import Calendar, DateEntry
 
 # ------------------------------- CONSTANTS ----------------------------------- #
 
@@ -32,8 +33,28 @@ def create_five_tabs(nb):
 
 # ---------------------------- BACKEND?? --------------------------------- #
 
+def insert_to_due_entry(date_picked):
+    calendar.destroy()
+    confirm_date_button.destroy()
+    date = date_picked.get()
+    hw_due_entry.delete('0', END)
+    hw_due_entry.insert('0', date)
+    print(date)
+
+
+def pick_due_date():
+    global hw_tab, pick_date_button, calendar, confirm_date_button
+    date_picked = StringVar(hw_tab, Calendar.date.today().strftime("%d/%m/%y"))
+    # pick_date_button['state'] = 'disabled'
+    calendar = Calendar(hw_tab, date_pattern="dd/mm/yyyy", textvariable=date_picked, showweeknumbers=False,
+                        showothermonthdays=False)
+    confirm_date_button = Button(hw_tab, text='Confirm date', command=lambda: insert_to_due_entry(date_picked))
+    confirm_date_button.grid(row=4, column=5)
+    calendar.grid(row=4, column=3)
+
+
 def add_hw_button(tab_hw):
-    global notebook, hw_due_entry, hw_subject_entry, hw_content_entry
+    global notebook, hw_due_entry, pick_date_button, hw_subject_entry, hw_content_entry
     notebook.tab(4, state='normal')
     notebook.select(4)
     
@@ -52,8 +73,19 @@ def add_hw_button(tab_hw):
     hw_due_entry = Entry(tab_hw, width=40, font=FONT)
     hw_due_entry.grid(row=3, column=2)
     
-    # add button
-    Button(tab_hw, text="  Save  ", font=FONT, command=save_hw).grid(row=9, column=5)
+    # the emoji dosesnot display correctly
+    pick_date_button = Button(tab_hw, text="📅Pick a date 🗓️", font=FONT, command=pick_due_date)
+    pick_date_button.grid(row=3, column=3)
+    
+    # date_picked = StringVar(hw_tab)
+    # date_picker = DateEntry(tab_hw, date_pattern='dd/mm/yyyy', textvariable=date_picked)
+    # date = date_picked.get()
+    # hw_due_entry.delete('0', END)
+    # hw_due_entry.insert('0', date)
+    # date_picker.grid(row=3, column=3)
+    
+    # save button
+    Button(tab_hw, text="Save Homework", font=FONT, command=save_hw).grid(row=5, column=2)
 
 
 def show_homework():
@@ -157,7 +189,7 @@ def create_todo():
     todo_title_label = Label(todo_tab, text="Title", font=FONT, padx=5, pady=5)
     todo_title_label.grid(row=1, column=0)
     todo_title_entry = Entry(todo_tab, font=FONT, width=40)
-    # todo_title_entry.focus()
+    todo_title_entry.focus()
     todo_title_entry.grid(row=2, column=0)
     
     todo_content_label = Label(todo_tab, text="Description: ", font=FONT)
@@ -231,7 +263,9 @@ todo_title_entry = Entry()
 todo_content_label = Label()
 todo_content_entry = Text()
 todo_save_button = Button()
-
+pick_date_button = Button()
+calendar = Calendar()
+confirm_date_button = Button()
 #  uncomment below for ugly styling
 style = ttk.Style(window)
 # style.theme_create("MyStyle", parent="alt", settings={
