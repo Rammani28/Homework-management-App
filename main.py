@@ -85,7 +85,7 @@ def signup(root, username_, password_, confirm_password_):
             
 
     # check validity of username and password
-
+#
 
 def signup_screen():
     global username_entry, password_entry
