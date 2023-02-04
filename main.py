@@ -11,14 +11,167 @@ from tkcalendar import Calendar
 
 FONT = ("Arial", 16, 'normal')
 DUE_HW_COUNTER = 0
-USERNAME = 'RAMMANI'
-PASSWORD_LEN = 4
+USERNAME: str = ''
+PASSWORD_LEN = 2
 LOGGED_IN = False
 
 
-# ------------------------------ FILE HANDLING -------------------------------- #
+# --------------------------------- LOGIN MANAGEMENT ------------------------------------#
+
+
+def set_username(var: str):
+    global USERNAME
+    USERNAME = var
+
+
+def signup(root, username_, password_, confirm_password_):
+    global USERNAME
+    password = password_.get()
+    username = username_.get()
+    confirm_password = confirm_password_.get()
+    print(f"password is {password_.get()}")
+    # root.destroy()
+    print(f"password is {password_.get()}")
+    
+    try:
+        with open("login.json") as login_file:
+            login_data = json.load(login_file)
+        
+        if username in login_data:
+            messagebox.showerror(title='Username Error!',
+                                 message='This username has been taken. Please chose another one.')
+        elif len(password) < PASSWORD_LEN:
+            messagebox.showerror(title='Too short password!',
+                                 message=f'Password must be at least {PASSWORD_LEN} characters')
+        elif password != confirm_password:
+            messagebox.showerror(title='Password did not Match',
+                                 message='confirmation of new password failed, Enter same password at both fields ')
+        else:
+            set_username(username)
+            messagebox.showinfo(title='Success',
+                                message=f"""Your account has been created
+                                \n username:{USERNAME}
+                                \npassword: {password}""")
+            new_user = {
+                f"{USERNAME}": {
+                    "password": f"{password}"
+                }
+            }
+            login_data.update(new_user)
+            with open('login.json', mode='w') as write_file:
+                json.dump(login_data, write_file, indent=4)
+    
+    except FileNotFoundError:
+        """Below code is for the first sign up"""
+
+        if len(password) < PASSWORD_LEN:
+            messagebox.showerror(title='Too short password!',
+                                 message=f'Password must be at least {PASSWORD_LEN} characters')
+            # signup_screen()
+        elif password != confirm_password:
+            messagebox.showerror(title='Password did not Match',
+                                 message='confirmation of new password failed, Enter same password at both fields ')
+            # signup_screen()
+        else:
+            set_username(username)
+            new_user = {
+                f"{USERNAME}": {
+                    'password': f"{password}"
+                }
+            }
+            with open("login.json", mode='w') as write_file:
+                json.dump(new_user, write_file, indent=4)
+            
+            
+
+    # check validity of username and password
+
+
+def signup_screen():
+    global username_entry, password_entry
+    signup_window = Tk()
+    signup_window.title = 'signup screen'
+    
+    username = StringVar(signup_window)
+    password = StringVar(signup_window)
+    confirm_password = StringVar(signup_window)
+    
+    username_label = Label(signup_window, text='Username', font=FONT)
+    username_label.pack()
+    
+    username_entry = Entry(signup_window, font=FONT, textvariable=username)
+    username_entry.pack()
+    username_entry.focus()
+    
+    password_label = Label(signup_window, text=f'Password(minimum {PASSWORD_LEN} characters)', font=FONT)
+    password_label.pack()
+    
+    password_entry = Entry(signup_window, font=FONT, textvariable=password)
+    password_entry.pack()
+    
+    Label(signup_window, font=FONT, text='confirm password').pack()
+    confirm_password_entry = Entry(signup_window, font=FONT, textvariable=confirm_password)
+    confirm_password_entry.pack()
+    
+    signup_button = Button(signup_window, text="Signup",
+                           command=lambda: signup(signup_window, username, password, confirm_password))
+    signup_button.pack()
+    signup_window.mainloop()
+
+
+def login(login_window, username, password):
+    global LOGGED_IN, USERNAME
+    try:
+        with open("login.json") as login_file:
+            login_data = json.load(login_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title='Sign Up first!', message="You need to Register/Signup to use the service! ")
+    
+    else:
+        for user in login_data:
+            if username.get() == user and password.get() == login_data[user]['password']:
+                LOGGED_IN = True
+                USERNAME = username.get()
+                login_window.destroy()
+                return
+        messagebox.showerror(title='Error', message='Invalid Username or Password! Try Again.')
+        # login_window.destroy()
+        # login_screen()
+
+
+def login_screen():
+    global username_label, username_entry, password_entry, password_label
+    
+    login_window = Tk()
+    username = StringVar(login_window)
+    password = StringVar(login_window)
+    
+    Label(text="Login to use the app\n(Create one if you don't have an account)").pack()
+    username_label = Label(login_window, text='Username', font=FONT)
+    username_label.pack(pady=10, padx=5)
+    
+    username_entry = Entry(login_window, font=FONT, textvariable=username)
+    username_entry.pack(pady=(10, 2), padx=5, ipadx=10)
+    username_entry.focus()
+    
+    password_label = Label(login_window, text=f'Password(minimum {PASSWORD_LEN} characters)', font=FONT)
+    password_label.pack(pady=(10, 2), padx=5)
+    
+    password_entry = Entry(login_window, font=FONT, textvariable=password)
+    password_entry.pack(pady=(0, 20), padx=5)
+    
+    login_button = Button(login_window, text="login", font=FONT,
+                          command=lambda: login(login_window, username, password))
+    login_button.pack(pady=10, padx=5)
+    
+    Label(login_window, text="Don't have an account? Register below!").pack(pady=(20, 0))
+    Button(login_window, text='Sign up', command=signup_screen).pack(pady=10, padx=5)
+    
+    login_window.mainloop()
+
 
 # ----------------------------- CREATE FIVE TABS ------------------------------ #
+
 
 def create_five_tabs(nb):
     tab1 = ttk.Frame(nb)
@@ -218,93 +371,9 @@ def show_todos():
     pass
 
 
-# --------------------------------- LOGIN MANAGEMENT ------------------------------------#
-
-
-def signup(root, username, password, confirm_password):
-    global USERNAME
-    root.destroy()
-    if username.get() in login_data:
-        messagebox.showerror(title='Username Error!', message='This username has been taken. Please chose another one.')
-        signup_screen()
-    elif len(password.get()) < PASSWORD_LEN:
-        messagebox.showerror(title='Too short password!', message='Password must be at least 8 characters')
-        signup_screen()
-    elif password.get() != confirm_password.get():
-        messagebox.showerror(title='Password did not Match',
-                             message='confirmation of new password failed, they did not match!  ')
-        signup_screen()
-    else:
-        messagebox.showinfo(title='Success', message=f'Your account has been created\n username:{username.get()}\npassword: {password.get()}')
-        new_user = {
-            f"{username.get()}": {
-                "password": f"{password.get()}"
-            }
-        }
-        login_data.update(new_user)
-        with open('login.json', mode='w') as write_file:
-            json.dump(login_data, write_file, indent=4)
-            
-            
-def signup_screen():
-    global username_label, username_entry, password_entry, password_label
-    signup_window = Tk()
-    signup_window.title = 'signup screen'
-
-    username = StringVar()
-    password = StringVar()
-    confirm_password = StringVar()
-    
-    username_label = Label(signup_window, text='Username', font=FONT)
-    username_label.pack()
-    
-    username_entry = Entry(signup_window, font=FONT, textvariable=username)
-    username_entry.pack()
-    username_entry.focus()
-    
-    password_label = Label(signup_window, text='Password(minimum 8 characters)', font=FONT)
-    password_label.pack()
-    
-    password_entry = Entry(signup_window, font=FONT, textvariable=password)
-    password_entry.pack()
-    
-    Label(signup_window, font=FONT, text='confirm password').pack()
-    confirm_password_entry = Entry(signup_window, font=FONT, textvariable=confirm_password)
-    confirm_password_entry.pack()
-    
-    signup_button = Button(signup_window, text="Signup", command=lambda: signup(signup_window, username, password, confirm_password))
-    signup_button.pack()
-    
-    signup_window.mainloop()
-    
-
-def login(root):
-    username = username_entry.get()
-    password = password_entry.get()
-
-
-def login_screen():
-    global username_label, username_entry, password_entry, password_label
-    
-    root = Tk()
-    Label(text="Login to use the app\n(Create one if you don't have an account)").pack()
-    username_label = Label(root, text='Username', font=FONT)
-    username_label.pack()
-    username_entry = Entry(root, font=FONT)
-    username_entry.pack()
-    username_entry.focus()
-    password_label = Label(root, text='Password(minimum 8 characters)', font=FONT)
-    password_label.pack()
-    password_entry = Entry(root, font=FONT)
-    password_entry.pack()
-    login_button = Button(root, text="login", command=lambda: login(root))
-    login_button.pack()
-    
-    root.mainloop()
-
-
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
+login_screen()
 
 # todo_id and sub_id handling
 try:
@@ -320,24 +389,8 @@ try:
         LATEST_TODO_ID = int(id_file.read())
 except FileNotFoundError:
     with open("todo_id.txt", mode='w') as id_file:
-        LATEST_TODO_ID = 1000
+        LATEST_TODO_ID = 10000
         id_file.write(f'{LATEST_TODO_ID}')
-
-try:
-    with open('data.json', mode='r') as file:
-        complete_data = json.load(file)
-        current_user_data = complete_data[f'{USERNAME}']
-except FileNotFoundError:
-    with open('data.json', mode='w') as file:
-        file_structure = {
-            f"{USERNAME}": {
-                "homework": {},
-                "todo": {},
-                "notes": {},
-                "completed_hw": {}
-            }
-        }
-        json.dump(file_structure, file, indent=4)
 
 '''
 delete this block (below) on completion of code
@@ -356,28 +409,35 @@ else:
         print(run_count)
 
 """ Login file below """
-try:
-    with open('login.json') as login_file:
-        # login_data = json.load(login_file)  # use this line later
-        login_data = {
-            'default': {
-                "password": "sudo"
-            }
-        }
-except FileNotFoundError:
-    messagebox.showinfo(title='Login or Signup to continue!',
-                        message="You must be logged in to use the service.\nOr create a new account")
-    login_data = {
-        'default': {
-            "password": "sudo"
-        }
-    }
-    signup_screen()
+# try:
+#     with open('login.json') as login_file:
+#         login_data = json.load(login_file)  # use this line later
+#
+# except FileNotFoundError:
+#     messagebox.showinfo(title='Login or Signup to continue!',
+#                         message="You must be logged in to use the service.\nOr create a new account")
+#     # signup_screen()
+
 # ---------------------------------- PROGRAM STARTS HERE ------------------------------------- #
 
-login_screen()
-
 if LOGGED_IN:
+    
+    try:
+        with open('data.json') as file:
+            complete_data = json.load(file)
+            current_user_data = complete_data[f'{USERNAME}']
+    except FileNotFoundError:
+        with open('data.json', mode='w') as file:
+            file_structure = {
+                f"{USERNAME}": {
+                    "homework": {},
+                    "todo": {},
+                    "notes": {},
+                    "completed_hw": {}
+                }
+            }
+            json.dump(file_structure, file, indent=4)
+    
     window = Tk()
     window.title(string="Homework Aid")
     
