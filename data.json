@@ -1,11 +1,35 @@
 {
     "ram": {
         "homework": {
-            "gfd": {
-                "description": "gre",
-                "due": "twetw",
+            "ram sub": {
+                "description": "ram desc",
+                "due": "11/05/2023",
                 "completed": false,
-                "id": 174
+                "id": 182
+            }
+        },
+        "todo": {
+            "hello": {
+                "description": "hello guys welcome to Tkinter.\n",
+                "id": 1038
+            }
+        },
+        "notes": {},
+        "completed_hw": {}
+    },
+    "sam": {
+        "homework": {
+            "sam sub": {
+                "description": "sam disc",
+                "due": "KDA",
+                "completed": false,
+                "id": 183
+            },
+            "SAM": {
+                "description": "SAMM",
+                "due": "SAMM",
+                "completed": false,
+                "id": 184
             }
         },
         "todo": {},

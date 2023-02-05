@@ -19,19 +19,16 @@ LOGGED_IN = False
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
 
 
-def set_username(var: str):
+def set_username_globally(var: str):
     global USERNAME
     USERNAME = var
 
 
 def signup(root, username_, password_, confirm_password_):
-    global USERNAME
+    global USERNAME, complete_data, current_user_data
     password = password_.get()
     username = username_.get()
     confirm_password = confirm_password_.get()
-    print(f"password is {password_.get()}")
-    # root.destroy()
-    print(f"password is {password_.get()}")
     
     try:
         with open("login.json") as login_file:
@@ -47,11 +44,12 @@ def signup(root, username_, password_, confirm_password_):
             messagebox.showerror(title='Password did not Match',
                                  message='confirmation of new password failed, Enter same password at both fields ')
         else:
-            set_username(username)
+            set_username_globally(username)
             messagebox.showinfo(title='Success',
                                 message=f"""Your account has been created
                                 \n username:{USERNAME}
                                 \npassword: {password}""")
+            root.destroy()
             new_user = {
                 f"{USERNAME}": {
                     "password": f"{password}"
@@ -60,10 +58,32 @@ def signup(root, username_, password_, confirm_password_):
             login_data.update(new_user)
             with open('login.json', mode='w') as write_file:
                 json.dump(login_data, write_file, indent=4)
+            
+            try:
+                with open('data.json') as read_file:
+                    complete_data = json.load(read_file)
+                    
+                current_user_data = {
+                    f"{USERNAME}": {
+                        "homework": {},
+                        "todo": {},
+                        "notes": {},
+                        "completed_hw": {}
+                    }
+                }
+                complete_data.update(current_user_data)
+                with open('data.json', mode='w') as write_file:
+                    json.dump(complete_data, write_file, indent=4)
+                    
+            except FileNotFoundError:
+                messagebox.showerror(title='FileNotFoundError!', message='data.json file seems to be deleted!')
+                pass
+    
+    
     
     except FileNotFoundError:
-        """Below code is for the first sign up"""
-
+        """Below code is for THE VERY FIRST sign up"""
+        
         if len(password) < PASSWORD_LEN:
             messagebox.showerror(title='Too short password!',
                                  message=f'Password must be at least {PASSWORD_LEN} characters')
@@ -73,7 +93,7 @@ def signup(root, username_, password_, confirm_password_):
                                  message='confirmation of new password failed, Enter same password at both fields ')
             # signup_screen()
         else:
-            set_username(username)
+            set_username_globally(username)
             new_user = {
                 f"{USERNAME}": {
                     'password': f"{password}"
@@ -81,10 +101,10 @@ def signup(root, username_, password_, confirm_password_):
             }
             with open("login.json", mode='w') as write_file:
                 json.dump(new_user, write_file, indent=4)
-            
-            
-
+    
     # check validity of username and password
+
+
 #
 
 def signup_screen():
@@ -125,7 +145,7 @@ def login(login_window, username, password):
         with open("login.json") as login_file:
             login_data = json.load(login_file)
     except FileNotFoundError:
-        messagebox.showinfo(title='Sign Up first!', message="You need to Register/Signup to use the service! ")
+        messagebox.showinfo(title='Sign Up first!', message="Register by creating an account below")
     
     else:
         for user in login_data:
@@ -436,6 +456,8 @@ if LOGGED_IN:
                     "completed_hw": {}
                 }
             }
+            complete_data = file_structure
+            current_user_data = file_structure[f"{USERNAME}"]
             json.dump(file_structure, file, indent=4)
     
     window = Tk()
