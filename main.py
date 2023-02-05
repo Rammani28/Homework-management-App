@@ -11,9 +11,12 @@ from tkcalendar import Calendar
 
 FONT = ("Arial", 16, 'normal')
 DUE_HW_COUNTER = 0
-USERNAME: str = ''
 PASSWORD_LEN = 2
-LOGGED_IN = False
+
+# USERNAME: str
+USERNAME = 'ram'  # TODO remove this line and use above line
+# LOGGED_IN = False
+LOGGED_IN = True  # TODO remove this line and use above line
 
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
@@ -62,7 +65,7 @@ def signup(root, username_, password_, confirm_password_):
             try:
                 with open('data.json') as read_file:
                     complete_data = json.load(read_file)
-                    
+                
                 current_user_data = {
                     f"{USERNAME}": {
                         "homework": {},
@@ -74,12 +77,9 @@ def signup(root, username_, password_, confirm_password_):
                 complete_data.update(current_user_data)
                 with open('data.json', mode='w') as write_file:
                     json.dump(complete_data, write_file, indent=4)
-                    
             except FileNotFoundError:
                 messagebox.showerror(title='FileNotFoundError!', message='data.json file seems to be deleted!')
                 pass
-    
-    
     
     except FileNotFoundError:
         """Below code is for THE VERY FIRST sign up"""
@@ -331,10 +331,42 @@ def save_hw():
         refresh_homeworks()
 
 
+def show_todos():
+    with open('data.json') as read_file:
+        todos = json.load(read_file)[f"{USERNAME}"]['todo']
+    row = 2
+    for a_title in todos:
+        Label(todo_tab, text=f'{a_title}', font=FONT).grid(row=row, column=0)  # title
+        Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT).grid(row=row, column=1)
+        
+        row += 1
+
+
+def create_todo():
+    global todo_content_entry, todo_title_entry, todo_save_button, todo_content_label, todo_title_label, temp_frame
+    temp_frame = Frame(todo_tab, background='white')
+    temp_frame.grid(row=1, columnspan=2)
+    
+    todo_create_button.configure(state='disabled')
+    todo_title_label = Label(temp_frame, text="Title", font=FONT, padx=5, pady=0)
+    todo_title_label.grid(row=1, column=0)
+    todo_title_entry = Entry(temp_frame, font=FONT, width=40)
+    
+    todo_title_entry.focus()
+    todo_title_entry.grid(row=2, column=0)
+    
+    todo_content_label = Label(temp_frame, text="Description: ", font=FONT)
+    todo_content_label.grid(row=3, column=0)
+    
+    todo_content_entry = Text(temp_frame, font=FONT, width=40, height=6)
+    todo_content_entry.grid(row=4, column=0)
+    todo_save_button = Button(temp_frame, text="  Save  ", font=FONT, command=save_todo)
+    todo_save_button.grid(row=5, column=0)
+
+
 def save_todo():
     global LATEST_TODO_ID
     LATEST_TODO_ID += 1
-    todo_create_button.configure(state='normal')
     new_todo = Todo()
     todo_create_button.configure(state='normal')
     
@@ -360,40 +392,13 @@ def save_todo():
         with open("data.json", mode='w') as write_file:
             json.dump(complete_data, write_file, indent=4)
         messagebox.showinfo(title='Todo Added', message='Todo has been created.')
-        todo_title_label.destroy()
-        todo_title_entry.destroy()
-        todo_content_label.destroy()
-        todo_content_entry.destroy()
-        todo_save_button.destroy()
-
-
-# ------------------------- MANAGE THE FOUR TABS -------------------------- #
-
-def create_todo():
-    global todo_content_entry, todo_title_entry, todo_save_button, todo_content_label, todo_title_label
-    
-    todo_create_button.configure(state='disabled')
-    todo_title_label = Label(todo_tab, text="Title", font=FONT, padx=5, pady=5)
-    todo_title_label.grid(row=1, column=0)
-    todo_title_entry = Entry(todo_tab, font=FONT, width=40)
-    todo_title_entry.focus()
-    todo_title_entry.grid(row=2, column=0)
-    
-    todo_content_label = Label(todo_tab, text="Description: ", font=FONT)
-    todo_content_label.grid(row=3, column=0)
-    todo_content_entry = Text(todo_tab, font=FONT, width=40, height=6)
-    todo_content_entry.grid(row=4, column=0)
-    todo_save_button = Button(todo_tab, text="  Save  ", font=FONT, command=save_todo)
-    todo_save_button.grid(row=5, column=0)
-
-
-def show_todos():
-    pass
+        temp_frame.destroy()
+        show_todos()
 
 
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
-login_screen()
+# login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -427,16 +432,6 @@ else:
         run_count += 1
         run_file.write(f"{run_count}")
         print(run_count)
-
-""" Login file below """
-# try:
-#     with open('login.json') as login_file:
-#         login_data = json.load(login_file)  # use this line later
-#
-# except FileNotFoundError:
-#     messagebox.showinfo(title='Login or Signup to continue!',
-#                         message="You must be logged in to use the service.\nOr create a new account")
-#     # signup_screen()
 
 # ---------------------------------- PROGRAM STARTS HERE ------------------------------------- #
 
@@ -480,6 +475,8 @@ if LOGGED_IN:
     username_entry = Entry()
     password_label = Label()
     password_entry = Entry()
+
+    temp_frame = Frame()
     
     #  uncomment below for ugly styling
     style = ttk.Style(window)
@@ -498,17 +495,20 @@ if LOGGED_IN:
     
     # ASSIGNMENT TAB
     Button(assignments_tab,
-           text="Create homework", font=FONT, command=lambda: add_hw_button(add_hw_tab)).grid(row=0, column=4)
+           text="Create homework",
+           font=FONT, command=lambda: add_hw_button(add_hw_tab)
+           ).grid(row=0, column=4)
     Label(assignments_tab, text="Due Homeworks", font=("Arial", 16, "bold"), padx=10).grid(row=0, column=0)
     Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold")).grid(row=1, column=0)
     Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold")).grid(row=1, column=1)
-    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold")).grid(row=1, column=2, columnspan=2)
+    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold")).grid(row=1, column=2)
     Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold")).grid(row=1, column=4)
     refresh_homeworks()
     
-    Label(todo_tab, text="Anything you want to do later? Add them here.", font=FONT, pady=20).grid(row=0, column=0)
-    todo_create_button = Button(todo_tab, text="Create", command=create_todo)  # hide it after clicking it
-    todo_create_button.grid(row=0, column=4)
+    # todo_tab
+    Label(todo_tab, text="Anything you want to do later? Add them here.", font=FONT).grid(row=0, column=0, columnspan=2)
+    todo_create_button = Button(todo_tab, text="Create", command=create_todo)
+    todo_create_button.grid(row=0, column=2)
     show_todos()
     
     window.mainloop()
