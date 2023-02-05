@@ -10,6 +10,7 @@ from tkcalendar import Calendar
 # ------------------------------- CONSTANTS ----------------------------------- #
 
 FONT = ("Arial", 16, 'normal')
+FONT_LOGIN = ('Noto Sans Canadian Aboriginal',25,'bold')
 DUE_HW_COUNTER = 0
 PASSWORD_LEN = 2
 
@@ -159,35 +160,68 @@ def login(login_window, username, password):
         # login_screen()
 
 
+def on_enter(event):
+    username_entry.delete(0,END)
+
+def on_leave(event):
+    name = username_entry.get()
+    if name =='':
+        username_entry.insert(0,'username')
+def p_on_enter(event):
+    password_entry.delete(0,END)    
+
+
 def login_screen():
     global username_label, username_entry, password_entry, password_label
     
+    xc = 100
+    yc = 100
+
+
     login_window = Tk()
+    login_window.title('login')
+    login_window.configure(bg = 'white')
+    login_window.geometry('925x500+300+200')
+    login_window.resizable(False,False)
+
+    img = PhotoImage(file = '/home/swornimstha/Desktop/backup/backups/python/TKinter/Homework-management-system/login.png')
+    Label(login_window,image = img,bg = 'white').place(x = 50,y = 50)
+
+    frame = Frame(login_window,width = 500,height = 500,bg = 'white')
+    frame.place(x = 480,y = 0)
+
+    heading = Label(frame,text="SIGN IN ",font = FONT_LOGIN,bg = 'white')
+    heading.place(x = xc+50,y = yc-30)
     username = StringVar(login_window)
     password = StringVar(login_window)
     
-    Label(text="Login to use the app\n(Create one if you don't have an account)").pack()
-    username_label = Label(login_window, text='Username', font=FONT)
-    username_label.pack(pady=10, padx=5)
+
+
+    username_label = Label(frame, text='Username', font=FONT,bg = 'white')
+    username_label.place(x = xc + 80,y = yc + 50 )
+    username_entry = Entry(frame,width = 25,fg = 'black',border = 0,bg = "white",font=('Noto Sans Myanmar UI',11), textvariable=username)
+    username_entry.place(x = xc,y = yc + 80+10)
+    username_entry.insert(0,'username')
+    username_entry.bind('<FocusIn>',on_enter)
+    username_entry.bind('<FocusOut>',on_leave)
+   
     
-    username_entry = Entry(login_window, font=FONT, textvariable=username)
-    username_entry.pack(pady=(10, 2), padx=5, ipadx=10)
-    username_entry.focus()
+    password_label = Label(frame, text='Password', font=FONT,bg = 'white')
+    password_label.place(x = 182,y = yc + 120+10)
     
-    password_label = Label(login_window, text=f'Password(minimum {PASSWORD_LEN} characters)', font=FONT)
-    password_label.pack(pady=(10, 2), padx=5)
+    password_entry = Entry(frame,width = 25,fg = 'black',border = 0,bg = 'white',font=('Noto Sans Myanmar UI',11), textvariable=password,show = '*')
+    password_entry.bind('<FocusIn>',p_on_enter)
+    password_entry.place(x= 100, y = yc + 160+10) 
+   
     
-    password_entry = Entry(login_window, font=FONT, textvariable=password)
-    password_entry.pack(pady=(0, 20), padx=5)
+    login_button = Button(frame,pady = 7, text="login",bg = '#57a1f8',fg = 'white',border = 0, font=FONT,command=lambda: login(login_window, username, password))
+    login_button.place(x = 190,y = yc + 200+10)
     
-    login_button = Button(login_window, text="login", font=FONT,
-                          command=lambda: login(login_window, username, password))
-    login_button.pack(pady=10, padx=5)
-    
-    Label(login_window, text="Don't have an account? Register below!").pack(pady=(20, 0))
-    Button(login_window, text='Sign up', command=signup_screen).pack(pady=10, padx=5)
+    Label(frame,text="Don't have an account?",fg = 'black',bg = 'white',font=('Noto Sans Myanmar UI',15)).place(x =  130,y = yc + 310)
+    Button(frame, text='Sign up',border = 0, bg = 'white',cursor='hand1',fg = '#57a1f8',command=signup_screen).place(x = 200,y = yc + 350)
     
     login_window.mainloop()
+
 
 
 # ----------------------------- CREATE FIVE TABS ------------------------------ #
