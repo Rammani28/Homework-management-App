@@ -1,0 +1,50 @@
+{
+    "ram": {
+        "homework": {
+            "science": {
+                "description": "Read about microbes",
+                "due": "29/07/2023",
+                "completed": false,
+                "id": 188,
+                "show": true
+            },
+            "social": {
+                "description": "read about justice",
+                "due": "18/07/2023",
+                "completed": true,
+                "id": 189,
+                "show": true
+            },
+            "fda": {
+                "description": "asdf",
+                "due": "18/07/2024",
+                "completed": false,
+                "id": 190,
+                "show": true
+            },
+            "fasdf s ": {
+                "description": "faswer",
+                "due": "09/06/2023",
+                "completed": true,
+                "id": 191,
+                "show": true
+            },
+            "sadf": {
+                "description": "asdf",
+                "due": "19/07/2023",
+                "completed": false,
+                "id": 192,
+                "show": true
+            }
+        },
+        "todo": {},
+        "notes": {},
+        "completed_hw": {}
+    },
+    "ram2": {
+        "homework": {},
+        "todo": {},
+        "notes": {},
+        "completed_hw": {}
+    }
+}

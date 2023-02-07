@@ -1,0 +1,8 @@
+{
+    "ram": {
+        "password": "sudo"
+    },
+    "ram2": {
+        "password": "sudo"
+    }
+}
