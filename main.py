@@ -110,33 +110,53 @@ def signup(root, username_, password_, confirm_password_):
 
 def signup_screen():
     global username_entry, password_entry
-    signup_window = Tk()
-    signup_window.title = 'signup screen'
+
+    xc = 100
+    yc = 100
+
+    signup_window = Toplevel()
+    signup_window.title('signup')
+    signup_window.configure(bg = 'white')
+    signup_window.geometry('925x500+300+200')
+    signup_window.resizable(False,False)
+    
     
     username = StringVar(signup_window)
     password = StringVar(signup_window)
     confirm_password = StringVar(signup_window)
     
-    username_label = Label(signup_window, text='Username', font=FONT)
-    username_label.pack()
-    
-    username_entry = Entry(signup_window, font=FONT, textvariable=username)
+    img = PhotoImage(file = '/home/swornimstha/Desktop/backup/backups/python/TKinter/Homework-management-system/login.png')
+    Label(signup_window,image = img,bg = 'white').place(x = 50,y = 50)
+
+    frame = Frame(signup_window,width = 500,height = 500,bg = 'white')
+    frame.place(x = 600,y = 30)
+
+    heading = Label(frame,text="SIGN UP",font = FONT_LOGIN,bg = 'white')
+    heading.pack(padx = 50,pady = 30)
+
+    username_label = Label(frame, text='Username', font=FONT,bg = 'white')
+    username_label.pack(pady = 10)
+    username_entry = Entry(frame,width = 25,fg = 'black',border = 0,bg = "white",font=('Noto Sans Myanmar UI',11), textvariable=username)
     username_entry.pack()
     username_entry.focus()
+    username_entry.insert(0,'username')
+    username_entry.bind('<FocusIn>',on_enter)
+    username_entry.bind('<FocusOut>',on_leave)
+
     
-    password_label = Label(signup_window, text=f'Password(minimum {PASSWORD_LEN} characters)', font=FONT)
-    password_label.pack()
+    password_label = Label(frame, text='Password', font=FONT,bg = 'white')
+    password_label.pack(pady = 10)
     
-    password_entry = Entry(signup_window, font=FONT, textvariable=password)
-    password_entry.pack()
+    password_entry = Entry(frame,width = 25,fg = 'black',border = 0,bg = 'white',font=('Noto Sans Myanmar UI',11), textvariable=password,show = '*')
+    password_entry.bind('<FocusIn>',p_on_enter)
+    password_entry.pack(pady = 10)
     
-    Label(signup_window, font=FONT, text='confirm password').pack()
-    confirm_password_entry = Entry(signup_window, font=FONT, textvariable=confirm_password)
-    confirm_password_entry.pack()
+    Label(frame, font=FONT, text='confirm password',bg = 'white').pack(pady = 10)
+    confirm_password_entry = Entry(frame,width = 25,fg = 'black',border = 0,bg = 'white',font=('Noto Sans Myanmar UI',11), textvariable=confirm_password,show = '*')
+    confirm_password_entry.pack(pady = 10)
     
-    signup_button = Button(signup_window, text="Signup",
-                           command=lambda: signup(signup_window, username, password, confirm_password))
-    signup_button.pack()
+    signup_button = Button(frame, text="Sign Up",command=lambda: signup(signup_window, username, password, confirm_password),pady = 7,bg = '#57a1f8',fg = 'white', border = 0,cursor='hand2')
+    signup_button.pack(pady = 10)
     signup_window.mainloop()
 
 
