@@ -225,7 +225,7 @@ sorted_subjects = sorted(homework.keys(), key=lambda x: homework[x]["due_date"],
 
 sorted_hw = {}
 for subject in sorted_subjects:
-    due_date = homework[subject]["due_date"].strftime("%d/%m/%Y")
+    due_date = homework[subject]["due"].strftime("%d/%m/%Y")
     sorted_hw[subject] = {
         "due_date": due_date,
         "description": homework[subject]["description"],

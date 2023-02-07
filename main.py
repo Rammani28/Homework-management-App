@@ -14,12 +14,14 @@ DUE_HW_COUNTER = 0
 PASSWORD_LEN = 2
 WHITE = 'white'
 GREEN = 'green'
+BLACK = 'black'
+BLUE = "#57a1f8"
 
-# LOGGED_IN = False
-# USERNAME: str
+LOGGED_IN = False
+USERNAME: str
 
-USERNAME = 'ram'  # TODO remove this line and use above line
-LOGGED_IN = True  # TODO remove this line and use above line
+# USERNAME = 'ram'  # TODO remove this line and use above line
+# LOGGED_IN = True  # TODO remove this line and use above line
 
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
@@ -226,6 +228,7 @@ def login_screen():
     username_label.place(x=xc + 80, y=yc + 50)
     username_entry = Entry(frame, width=25, fg='black', border=0, bg="white", font=('Noto Sans Myanmar UI', 11),
                            textvariable=username)
+    username_entry.focus()
     username_entry.place(x=xc, y=yc + 80 + 10)
     username_entry.insert(0, 'username')
     username_entry.bind('<FocusIn>', on_enter)
@@ -255,19 +258,20 @@ def login_screen():
 
 
 def create_five_tabs(nb):
-    tab1 = ttk.Frame(nb)
-    tab1.config()
-    tab2 = ttk.Frame(nb)
-    tab3 = ttk.Frame(nb)
-    tab4 = ttk.Frame(nb)
-    tab5 = ttk.Frame(nb)
+    tab1 = ttk.Frame(nb, width=925, height=500)
+    tab2 = ttk.Frame(nb, width=925, height=500)
+    tab3 = ttk.Frame(nb, width=925, height=500)
+    tab4 = ttk.Frame(nb, width=925, height=500)
+    tab5 = ttk.Frame(nb, width=925, height=500)
     tab_style = ttk.Style()
     tab_style.configure('TNotebook.Tab',
                         font=('Arial', 16, 'bold'),
-                        foreground='blue',
-                        background=WHITE,
+                        foreground=WHITE,
+                        background=BLUE,
                         width=15,
                         padding=(5, 10, 5, 10))
+    tab_style.configure("TFrame", background=WHITE, foreground='black')
+    tab_style.configure("TButton", background=WHITE)
     nb.add(tab1, text="    Dashboard  ")
     nb.add(tab2, text="   Assignments ")
     nb.add(tab3, text="      Notes  ")
@@ -276,6 +280,7 @@ def create_five_tabs(nb):
     nb.pack()
     nb.enable_traversal()
     nb.configure()
+
     return tab1, tab2, tab3, tab4, tab5
 
 
@@ -292,10 +297,10 @@ def insert_to_due_entry(date_picked):
 
 def pick_due_date():
     global calendar, confirm_date_button
-    date_picked = StringVar(add_hw_tab, Calendar.date.today().strftime("%d/%m/%y"))
+    date_picked = StringVar(add_hw_tab, Calendar.date.today().strftime("%y/%m/%d"))
     calendar = Calendar(
         add_hw_tab,
-        date_pattern="dd/mm/yyyy",
+        date_pattern="yyyy/mm/dd",
         textvariable=date_picked,
         showweeknumbers=False,
         showothermonthdays=False
@@ -346,19 +351,19 @@ def refresh_homeworks():
     except FileNotFoundError:
         messagebox.showerror(title="File not found!", message="No data file has been found!")
     else:
-        row = 2
+        row = 3
         for subject in hw:
             # display items with show=true from HOMEWORK_LIST
             if hw[subject]['show'] is True:
                 DUE_HW_COUNTER += 1
                 
-                status_label = Label(assignments_tab, text='Due', fg='red', font=FONT)
+                status_label = Label(assignments_tab, text='Due', fg='red', font=FONT, background=WHITE)
                 status_label.grid(row=row, column=0)
                 if hw[subject]['completed'] is True:
-                    status_label.configure(text='Completed', fg=GREEN)
-                Label(assignments_tab, text=f"{subject}", padx=10, font=FONT).grid(row=row, column=1)
-                Label(assignments_tab, text=f"{hw[subject]['description']}", padx=20, font=FONT).grid(row=row, column=2)
-                Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT).grid(row=row, column=4)
+                    status_label.configure(text='Completed', fg=GREEN, background=WHITE)
+                Label(assignments_tab, text=f"{subject}", padx=10, font=FONT, background=WHITE).grid(row=row, column=1)
+                Label(assignments_tab, text=f"{hw[subject]['description']}", padx=20, font=FONT, background=WHITE).grid(row=row, column=2)
+                Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(row=row, column=4)
                 row += 1
 
 
@@ -465,8 +470,7 @@ def save_todo():
 
 
 # ---------------------------------- FILE HANDLING -------------------------------------- #
-
-# login_screen()  # TODO Uncomment this line on completion of code
+login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -524,6 +528,7 @@ if LOGGED_IN:
             json.dump(file_structure, file, indent=4)
     
     window = Tk()
+    window.geometry("900x500+300+200")
     window.title(string="Homework Aid")
     
     # global WIDGETS so that they can be READ/DESTROYED anywhere in the code
@@ -548,31 +553,30 @@ if LOGGED_IN:
     
     #  uncomment below for ugly styling
     style = ttk.Style(window)
-    # style.theme_create("MyStyle", parent="alt", settings={
-    #     "TNotebook": {"configure": {"tabmargins": [20, 0, 2, 0]}},
-    #     "TNotebook.Tab": {"configure": {"padding": [10, 90, 10, 90]}, }})
-    # style.theme_use("MyStyle")
-    style.configure('left_tab.TNotebook', tabposition='wn')
-    style.configure('TNotebook')
+    style.configure('TNotebook', background=WHITE, tabposition='wn')
     
     notebook = ttk.Notebook(window, style='left_tab.TNotebook')
     all_tabs = create_five_tabs(notebook)
     dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab = all_tabs
     
     # DASH TAB
-    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10).grid(row=1, column=1)
+    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE).grid(row=1, column=1)
+    Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(row=2, column=1)
     
     # ASSIGNMENT TAB
     Button(assignments_tab,
            text="Create homework",
            cursor='hand1',
+           border=0, pady=7,
+           fg=WHITE, bg=BLUE,
            font=FONT, command=lambda: add_hw_button(add_hw_tab)
-           ).grid(row=0, column=4)
-    Label(assignments_tab, text="Due Homeworks", font=("Arial", 16, "bold"), padx=10).grid(row=0, column=0)
-    Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold")).grid(row=1, column=0)
-    Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold")).grid(row=1, column=1)
-    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold")).grid(row=1, column=2)
-    Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold")).grid(row=1, column=4)
+           ).grid(row=0, column=2)
+    Label(assignments_tab, text="", font=FONT, fg=BLUE, bg=WHITE).grid(row=1, column=0, columnspan=4)
+    Label(assignments_tab, text="Due Homeworks", font=("Arial", 26, "bold"), padx=10, fg=BLUE, bg=WHITE).grid(row=0, column=0)
+    Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=0)
+    Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=1)
+    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=2)
+    Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=4)
     refresh_homeworks()
     
     # todo_tab
