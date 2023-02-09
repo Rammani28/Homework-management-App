@@ -18,7 +18,10 @@ GREEN = 'green'
 BLACK = 'black'
 BLUE = "#57a1f8"
 RED = '#FEDEFF'
-LIGHT_GREEN = 'light green'
+LIGHT_GREEN = '#a6ff4d'
+LIGHT_YELLOW = '#ffff66'
+note_row = 1
+note_column = 0
 
 LOGGED_IN = False
 USERNAME: str = 'ram'
@@ -300,7 +303,7 @@ def login_screen():
         x=200, y=yc + 350)
     
     Button(login_frame, text="About", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
-           highlightthickness=0, command=show_about).place(y=20, x=350)
+           highlightthickness=0, command=show_about,padx = 10,pady = 10).place(y=20, x=350)
     main_window.mainloop()
 
 # ----------------------------- CREATE FIVE TABS ------------------------------ #
@@ -534,7 +537,27 @@ def save_todo():
         messagebox.showinfo(title='Todo Added', message='Todo has been created.')
         temp_frame.destroy()
         show_todos()
+def n_on_leave(event):
+    note_text_data = text_box.get(index1=1.0,index2='end')
 
+    if note_text_data == '':
+        print('a')
+        text_box.insert(0,'enter a note')
+
+def create_note():
+    global note_row,note_column,text_box
+    note_frame = Frame(notes_tab)
+    note_frame.configure(height=250, width=200, bg=LIGHT_YELLOW)
+    note_frame.grid(row = note_row,column = note_column,padx = 10,pady = 10)
+    text_box = Text(note_frame,font = FONT,width = 15,height = 9,border =0,bg=LIGHT_YELLOW)
+    text_box.bind('<Return>',n_on_leave)
+    text_box.grid() 
+    note_column = note_column + 1
+    if note_column == 4 :
+        note_row = note_row + 1
+        note_column = 0
+
+    pass
 
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
@@ -614,6 +637,8 @@ if LOGGED_IN:
     calendar = Calendar()
     confirm_date_button = Button()
     
+    text_box = Text()
+    
     s_username_entry = Entry()
     s_password_entry = Entry()
     l_username_entry = Entry()
@@ -664,5 +689,9 @@ if LOGGED_IN:
                                 background='white', borderwidth=0)
     todo_create_button.grid(row=0, column=2)
     show_todos()
+    
+    # note tab  
+    Label(notes_tab,text = "Create Note ",font = FONT,bg = LIGHT_GREEN,fg = BLACK,).grid(row = 0,column = 0)
+    Button(notes_tab,text = '+',cursor = 'hand1',bg = BLUE,fg = BLACK,font = '24',command = create_note).grid(row = 0, column = 1,sticky = W)
     
     window.mainloop()
