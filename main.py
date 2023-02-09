@@ -5,6 +5,7 @@ from tkinter import ttk
 from tkcalendar import Calendar
 from todo import Todo
 from sort import sort_hw
+from delete import delete_hw
 
 # ------------------------------- CONSTANTS ----------------------------------- #
 
@@ -417,7 +418,7 @@ def refresh_homeworks():
                     row=row, column=2)
                 Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(
                     row=row, column=4)
-                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18))
+                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18), command=lambda: delete_hw(USERNAME, f"{hw[subject]}", hw[subject]['id']))
                 delButton.grid(row=row, column=5, padx=(5, 5))
                 row += 1
 
@@ -481,25 +482,25 @@ def add_bullet_point(event):
 def create_todo():
     global todo_content_entry, todo_title_entry, todo_save_button, todo_content_label, todo_title_label
     
-    notebook.tab(about_tab, state='normal')
-    notebook.select(about_tab)
+    notebook.tab(add_todo_tab, state='normal')
+    notebook.select(add_todo_tab)
     
     todo_create_button.configure(font=FONT)
-    todo_title_label = Label(about_tab, text="Title", font=FONT, padx=5, pady=0)
+    todo_title_label = Label(add_todo_tab, text="Title", font=FONT, padx=5, pady=0)
     todo_title_label.grid(row=1, column=0)
-    todo_title_entry = Entry(about_tab, font=FONT, width=40)
+    todo_title_entry = Entry(add_todo_tab, font=FONT, width=40)
     
     todo_title_entry.focus()
     todo_title_entry.grid(row=2, column=0)
     
-    todo_content_label = Label(about_tab, text="Description: ", font=FONT)
+    todo_content_label = Label(add_todo_tab, text="Description: ", font=FONT)
     todo_content_label.grid(row=3, column=0)
     
-    todo_content_entry = Text(about_tab, font=FONT, width=40, height=6)
+    todo_content_entry = Text(add_todo_tab, font=FONT, width=40, height=6)
     todo_content_entry.bind("<Return>", add_bullet_point)
     
     todo_content_entry.grid(row=4, column=0)
-    todo_save_button = Button(about_tab, text="  Save  ", font=FONT, command=save_todo, cursor='hand1')
+    todo_save_button = Button(add_todo_tab, text="  Save  ", font=FONT, command=save_todo, cursor='hand1')
     todo_save_button.grid(row=5, column=0)
 
 
@@ -627,7 +628,7 @@ if LOGGED_IN:
     
     notebook = ttk.Notebook(window, style='left_tab.TNotebook')
     all_tabs = create_six_tabs(notebook)
-    dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab, about_tab = all_tabs
+    dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab, add_todo_tab = all_tabs
     
     # DASH TAB
     Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE).grid(row=1,
