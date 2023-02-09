@@ -17,13 +17,14 @@ GREEN = 'green'
 BLACK = 'black'
 BLUE = "#57a1f8"
 RED = '#FEDEFF'
+LIGHT_GREEN = 'light green'
 
 LOGGED_IN = False
 USERNAME: str = 'ram'
 
-
 # USERNAME = 'ram'  # TODO remove this line and use above line
 # LOGGED_IN = True  # TODO remove this line and use above line
+
 
 # --------------------------------- STYLES ------------------------------------#
 
@@ -36,13 +37,62 @@ def set_username_globally(var: str):
     USERNAME = var
 
 
-def signup(root, username_, password_, confirm_password_):
+def l_u_on_enter(event):
+    l_username_entry.delete(0, END)
+
+
+def l_u_on_leave(event):
+    name = l_username_entry.get()
+    if name == '':
+        l_username_entry.insert(0, 'username')
+
+
+def s_u_on_enter(event):
+    s_username_entry.delete(0, END)
+
+
+def s_u_on_leave(event):
+    name = s_username_entry.get()
+    if name == '':
+        s_username_entry.insert(0, 'username')
+
+
+def s_p_on_enter(event):
+    s_password_entry.delete(0, END)
+
+
+def l_p_on_enter(event):
+    l_password_entry.delete(0, END)
+
+
+def go_back():
+    # global about_frame
+    about_frame.destroy()
+
+
+def show_about():
+    global about_frame, main_window
+    about_frame = Frame(main_window, width=500, height=500, bg=WHITE)
+    about_frame.place(x=440, y=0)
+    Button(about_frame, text="Back", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
+           highlightthickness=0, command=go_back).place(y=20, x=350)
+    
+    Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
+    Label(about_frame, text=' S Sonim\n M Aashiq Kumar\n A Rammani\n M Mandeep', fg=BLACK, bg=WHITE,
+          justify=LEFT).place(x=180, y=130)
+    
+    pass
+
+
+def signup(username_, password_, confirm_password_):
     global USERNAME, complete_data, current_user_data
     password = password_.get()
     username = username_.get()
     confirm_password = confirm_password_.get()
     
     try:
+        # ----------------- check validity of username and password ---------------#
+        
         with open("login.json") as login_file:
             login_data = json.load(login_file)
         
@@ -59,14 +109,16 @@ def signup(root, username_, password_, confirm_password_):
                                  message='confirmation of new password failed, Enter same password at both fields ')
         
         else:
-            set_username_globally(username)
+            # it is valid
+            
+            # set_username_globally(username)
             messagebox.showinfo(title='Success',
                                 message=f"""Your account has been created
-                                \n username:{USERNAME}
+                                \n username:{username}
                                 \npassword: {password}""")
-            # root.destroy()
+            
             new_user = {
-                f"{USERNAME}": {
+                f"{username}": {
                     "password": f"{password}"
                 }
             }
@@ -105,77 +157,77 @@ def signup(root, username_, password_, confirm_password_):
                                  message='confirmation of new password failed, Enter same password at both fields ')
             # signup_screen()
         else:
-            set_username_globally(username)
+            # set_username_globally(username)
             new_user = {
-                f"{USERNAME}": {
+                f"{username}": {
                     'password': f"{password}"
                 }
             }
             with open("login.json", mode='w') as write_file:
                 json.dump(new_user, write_file, indent=4)
-    
-    # check validity of username and password
+            messagebox.showinfo(title='Success',
+                                message=f"""Your account has been created
+                                            \n username:{USERNAME}
+                                            \npassword: {password}""")
+            signup_frame.destroy()
 
-
-#
 
 def signup_screen():
-    global username_entry, password_entry
+    global signup_frame, s_username_entry, s_password_entry, main_window
     
     xc = 100
     yc = 100
     
-    signup_window = Toplevel()
-    signup_window.title('signup')
-    signup_window.configure(bg='white')
-    signup_window.geometry('925x500+300+200')
-    # signup_window.resizable(False, False)
+    signup_frame = Frame(main_window, width=500, height=500, bg=WHITE)
+    signup_frame.place(x=480, y=0)
     
-    username = StringVar(signup_window)
-    password = StringVar(signup_window)
-    confirm_password = StringVar(signup_window)
+    s_username = StringVar(signup_frame)
+    s_password = StringVar(signup_frame)
+    confirm_password = StringVar(signup_frame)
     
-    img = PhotoImage(file='login_img.png')
-    Label(signup_window, image=img, bg='white').place(x=50, y=50)
+    heading = Label(signup_frame, text="SIGN UP", font=FONT_LOGIN, bg='white')
+    heading.place(x=xc + 50, y=yc - 30)
     
-    frame = Frame(signup_window, width=500, height=500, bg='white')
-    frame.place(x=600, y=30)
+    Label(signup_frame, text='Username', font=FONT, bg='white').place(x=xc + 68, y=yc + 50)
+    s_username_entry = Entry(signup_frame, width=25, fg='black', border=0, bg="white",
+                             font=('Noto Sans Myanmar UI', 11),
+                             textvariable=s_username)
+    s_username_entry.place(x=xc, y=yc + 90)
+    s_username_entry.focus()
     
-    heading = Label(frame, text="SIGN UP", font=FONT_LOGIN, bg='white')
-    heading.pack(padx=50, pady=30)
+    s_username_entry.insert(0, 'username')
+    s_username_entry.bind('<FocusIn>', s_u_on_enter)
+    s_username_entry.bind('<FocusOut>', s_u_on_leave)
+    #
+    Label(signup_frame, text='Password', font=FONT, bg='white').place(x=xc + 70, y=yc + 130)
     
-    username_label = Label(frame, text='Username', font=FONT, bg='white')
-    username_label.pack(pady=10)
-    username_entry = Entry(frame, width=25, fg='black', border=0, bg="white", font=('Noto Sans Myanmar UI', 11),
-                           textvariable=username)
-    username_entry.pack()
-    username_entry.focus()
-    # username_entry.insert(0, 'username')
-    # username_entry.bind('<FocusIn>', on_enter)
-    # username_entry.bind('<FocusOut>', on_leave)
+    s_password_entry = Entry(signup_frame, width=25, fg='black', border=0, bg='white',
+                             font=('Noto Sans Myanmar UI', 11),
+                             textvariable=s_password, show='*')
+    s_password_entry.bind('<FocusIn>', s_p_on_enter)
+    s_password_entry.place(x=100, y=yc + 170)
     
-    password_label = Label(frame, text='Password', font=FONT, bg='white')
-    password_label.pack(pady=10)
-    
-    password_entry = Entry(frame, width=25, fg='black', border=0, bg='white', font=('Noto Sans Myanmar UI', 11),
-                           textvariable=password, show='*')
-    # password_entry.bind('<FocusIn>', p_on_enter)
-    password_entry.pack(pady=10)
-    
-    Label(frame, font=FONT, text='confirm password', bg='white').pack(pady=10)
-    confirm_password_entry = Entry(frame, width=25, fg='black', border=0, bg='white', font=('Noto Sans Myanmar UI', 11),
+    Label(signup_frame, font=FONT, text='confirm password', bg='white').place(x=xc + 28, y=yc + 210)
+    confirm_password_entry = Entry(signup_frame, width=25, fg='black', border=0, bg='white',
+                                   font=('Noto Sans Myanmar UI', 11),
                                    textvariable=confirm_password, show='*')
-    confirm_password_entry.pack(pady=10)
+    confirm_password_entry.place(x=xc, y=yc + 260)
     
-    signup_button = Button(frame, text="Sign Up",
-                           command=lambda: signup(signup_window, username, password, confirm_password), pady=7,
-                           bg='#57a1f8', fg='white', border=0, cursor='hand2')
-    signup_button.pack(pady=10)
-    signup_window.mainloop()
+    signup_button = Button(signup_frame, text="Sign Up",
+                           command=lambda: signup(s_username, s_password, confirm_password),
+                           pady=7,
+                           bg='#57a1f8',
+                           fg='white',
+                           border=0,
+                           cursor='hand2')
+    signup_button.place(x=xc + 100, y=yc + 350)
+    Button(signup_frame, text="Back", bd=0, fg=WHITE, bg=LIGHT_GREEN, cursor="hand2", font=FONT, highlightthickness=0,
+           command=signup_frame.destroy).place(x=350, y=20)
 
 
-def login(login_window, username, password):
-    global LOGGED_IN, USERNAME
+def login(username, password):
+    global LOGGED_IN, USERNAME, main_window
+    
     try:
         with open("login.json") as login_file:
             login_data = json.load(login_file)
@@ -187,102 +239,69 @@ def login(login_window, username, password):
             if username.get() == user and password.get() == login_data[user]['password']:
                 LOGGED_IN = True
                 USERNAME = username.get()
-                login_window.destroy()
+                main_window.destroy()
                 return
         messagebox.showerror(title='Error', message='Invalid Username or Password! Try Again.')
-        login_window.destroy()
+        main_window.destroy()
         login_screen()
 
 
-def on_enter(event):
-    username_entry.delete(0, END)
-
-
-def on_leave(event):
-    name = username_entry.get()
-    if name == '':
-        username_entry.insert(0, 'username')
-
-
-def p_on_enter(event):
-    password_entry.delete(0, END)
-
-
-def go_back():
-    # global about_frame
-    about_frame.destroy()
-
-
-def show_about():
-    global login_window, about_frame
-    about_frame = Frame(login_window, width=500, height=500, bg='white')
-    about_frame.place(x=440, y=0)
-    Button(about_frame, text="<<< Back", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
-           highlightthickness=0, command=go_back).place(y=20, x=350)
-    
-    Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
-    Label(about_frame, text=' S Sonim\n M Aashiq Kumar\n A Rammani\n M Mandeep', fg=BLACK, bg=WHITE, justify=LEFT).place(x=180, y=130)
-    
-    pass
-
-
 def login_screen():
-    global login_window, username_label, username_entry, password_entry, password_label
+    global l_username_entry, l_password_entry, main_window
     
     xc = 100
     yc = 100
-    
-    login_window = Tk()
-    login_window.title('login')
-    login_window.configure(bg='white')
-    login_window.geometry('925x500+300+200')
-    login_window.resizable(False, False)
+
+    main_window = Tk()
+    main_window.title('Homework Aid main window')
+    main_window.configure(bg=WHITE)
+    main_window.geometry('925x500+300+200')
+    main_window.resizable(False, False)
     
     login_img = PhotoImage(file='login_img.png')
-    Label(login_window, image=login_img, bg='white').place(x=50, y=50)
+    Label(main_window, image=login_img, bg='white').place(x=50, y=50)
     
-    signin_frame = Frame(login_window, width=500, height=500, bg='white')
-    signin_frame.place(x=480, y=0)
+    login_frame = Frame(main_window, width=500, height=500, bg=WHITE)
+    login_frame.place(x=480, y=0)
     
-    heading = Label(signin_frame, text="SIGN IN ", font=FONT_LOGIN, bg='white')
+    heading = Label(login_frame, text="SIGN IN ", font=FONT_LOGIN, bg='white')
     heading.place(x=xc + 50, y=yc - 30)
-    username = StringVar(login_window)
-    password = StringVar(login_window)
     
-    username_label = Label(signin_frame, text='Username', font=FONT, bg='white')
-    username_label.place(x=xc + 80, y=yc + 50)
-    username_entry = Entry(signin_frame, width=25, fg='black', border=0, bg="white", font=('Noto Sans Myanmar UI', 11),
-                           textvariable=username)
-    username_entry.focus()
-    username_entry.place(x=xc, y=yc + 80 + 10)
-    username_entry.insert(0, 'username')
-    username_entry.bind('<FocusIn>', on_enter)
-    username_entry.bind('<FocusOut>', on_leave)
+    l_username = StringVar(main_window)
+    l_password = StringVar(main_window)
     
-    password_label = Label(signin_frame, text='Password', font=FONT, bg='white')
+    Label(login_frame, text='Username', font=FONT, bg='white').place(x=xc + 80, y=yc + 50)
+    l_username_entry = Entry(login_frame, width=25, fg='black', border=0, bg="white", font=('Noto Sans Myanmar UI', 11),
+                             textvariable=l_username)
+    l_username_entry.focus()
+    l_username_entry.place(x=xc, y=yc + 80 + 10)
+    l_username_entry.insert(0, 'username')
+    l_username_entry.bind('<FocusIn>', l_u_on_enter)
+    l_username_entry.bind('<FocusOut>', l_u_on_leave)
+    
+    password_label = Label(login_frame, text='Password', font=FONT, bg='white')
     password_label.place(x=182, y=yc + 120 + 10)
     
-    password_entry = Entry(signin_frame, width=25, fg='black', border=0, bg='white', font=('Noto Sans Myanmar UI', 11),
-                           textvariable=password, show='*')
-    password_entry.bind('<FocusIn>', p_on_enter)
-    password_entry.place(x=100, y=yc + 160 + 10)
+    l_password_entry = Entry(login_frame, width=25, fg='black', border=0, bg='white', font=('Noto Sans Myanmar UI', 11),
+                             textvariable=l_password, show='*')
+    l_password_entry.bind('<FocusIn>', l_p_on_enter)
+    l_password_entry.place(x=100, y=yc + 160 + 10)
     
-    login_button = Button(signin_frame, pady=7, text="login", bg='#57a1f8', fg='white', border=0, font=FONT,
+    login_button = Button(login_frame, pady=7, text="login", bg='#57a1f8', fg='white', border=0, font=FONT,
                           cursor='hand1',
-                          command=lambda: login(login_window, username, password))
+                          command=lambda: login(l_username, l_password))
     login_button.place(x=190, y=yc + 200 + 10)
     
-    Label(signin_frame, text="Don't have an account?", fg='black', bg='white', font=('Noto Sans Myanmar UI', 15)).place(
+    Label(login_frame, text="Don't have an account?", fg='black', bg='white', font=('Noto Sans Myanmar UI', 15)).place(
         x=130,
         y=yc + 310)
-    Button(signin_frame, text='Sign up', border=0, bg='white', cursor='hand1', fg='#57a1f8',
+    Button(login_frame, text='Sign up', border=0, bg='white', cursor='hand1', fg='#57a1f8',
            command=signup_screen).place(
         x=200, y=yc + 350)
     
-    Button(signin_frame, text="About", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
+    Button(login_frame, text="About", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
            highlightthickness=0, command=show_about).place(y=20, x=350)
-    login_window.mainloop()
-
+    main_window.mainloop()
 
 # ----------------------------- CREATE FIVE TABS ------------------------------ #
 
@@ -310,9 +329,9 @@ def create_six_tabs(nb):
     nb.add(tab4, text="    Todo  ")
     nb.add(tab5, text="Add Assignments", state='hidden')
     nb.add(tab6, text="About", state='hidden')
-    nb.pack()
+    nb.grid()
     nb.enable_traversal()
-    nb.configure()
+    # nb.configure()
     
     return tab1, tab2, tab3, tab4, tab5, tab6
 
@@ -399,7 +418,7 @@ def refresh_homeworks():
                     row=row, column=2)
                 Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(
                     row=row, column=4)
-                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg=RED, font=('Arial', 18))
+                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18))
                 delButton.grid(row=row, column=5, padx=(5, 5))
                 row += 1
 
@@ -447,7 +466,8 @@ def show_todos():
     row = 2
     for a_title in todos:
         Label(todo_tab, text=f'{a_title}', font=FONT).grid(row=row, column=0)  # title
-        Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK).grid(row=row, column=1)
+        Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK).grid(
+            row=row, column=1)
         
         row += 1
 
@@ -459,8 +479,8 @@ def add_bullet_point(event):
 
 
 def create_todo():
-    global todo_content_entry, todo_title_entry, todo_save_button, todo_content_label, todo_title_label, temp_frame
-
+    global todo_content_entry, todo_title_entry, todo_save_button, todo_content_label, todo_title_label
+    
     notebook.tab(about_tab, state='normal')
     notebook.select(about_tab)
     
@@ -516,6 +536,8 @@ def save_todo():
 
 
 # ---------------------------------- FILE HANDLING -------------------------------------- #
+
+
 login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
@@ -554,7 +576,6 @@ else:
 # ---------------------------------- PROGRAM STARTS HERE ------------------------------------- #
 
 if LOGGED_IN:
-    
     try:
         with open('data.json') as file:
             complete_data = json.load(file)
@@ -574,6 +595,8 @@ if LOGGED_IN:
             json.dump(file_structure, file, indent=4)
     
     window = Tk()
+    window.quit()
+    
     window.geometry("900x500+300+200")
     window.title(string="Homework Aid")
     
@@ -590,14 +613,14 @@ if LOGGED_IN:
     calendar = Calendar()
     confirm_date_button = Button()
     
-    username_label = Label()
-    username_entry = Entry()
-    password_label = Label()
-    password_entry = Entry()
+    s_username_entry = Entry()
+    s_password_entry = Entry()
+    l_username_entry = Entry()
+    l_password_entry = Entry()
     
     temp_frame = Frame()
-    login_window = Tk()
     about_frame = Frame()
+    signup_frame = Frame()
     
     style = ttk.Style(window)
     style.configure('TNotebook', background=WHITE, tabposition='wn')
@@ -621,8 +644,9 @@ if LOGGED_IN:
            font=FONT, command=lambda: add_hw_button(add_hw_tab)
            ).grid(row=0, column=2)
     Label(assignments_tab, text="", font=FONT, fg=BLUE, bg=WHITE).grid(row=1, column=0, columnspan=4)
-    Label(assignments_tab, text="Due Homeworks", font=("Arial", 26, "bold"), padx=10, fg="#7286D3", bg=WHITE).grid(row=0,
-                                                                                                              column=0)
+    Label(assignments_tab, text="Due Homeworks", font=("Arial", 26, "bold"), padx=10, fg="#7286D3", bg=WHITE).grid(
+        row=0,
+        column=0)
     Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=0)
     Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
                                                                                                          column=1)
@@ -639,6 +663,10 @@ if LOGGED_IN:
     todo_create_button.grid(row=0, column=2)
     show_todos()
     
-    # About tab
+    
+    
+    
+    
+    
     
     window.mainloop()
