@@ -80,7 +80,6 @@ def show_about():
     Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
     Label(about_frame, text=' S Sonim\n M Aashiq Kumar\n A Rammani\n M Mandeep', fg=BLACK, bg=WHITE,
           justify=LEFT).place(x=180, y=130)
-    
     pass
 
 
@@ -307,12 +306,12 @@ def login_screen():
 
 
 def create_six_tabs(nb):
-    tab1 = ttk.Frame(nb, width=925, height=500)
-    tab2 = ttk.Frame(nb, width=925, height=500)
-    tab3 = ttk.Frame(nb, width=925, height=500)
-    tab4 = ttk.Frame(nb, width=925, height=500)
-    tab5 = ttk.Frame(nb, width=925, height=500)
-    tab6 = ttk.Frame(nb, width=925, height=500)
+    tab1 = ttk.Frame(nb, width=1200, height=600)
+    tab2 = ttk.Frame(nb, width=1200, height=600)
+    tab3 = ttk.Frame(nb, width=1200, height=600)
+    tab4 = ttk.Frame(nb, width=1200, height=600)
+    tab5 = ttk.Frame(nb, width=1200, height=600)
+    tab6 = ttk.Frame(nb, width=1200, height=600)
     tab_style = ttk.Style()
     tab_style.configure('TNotebook.Tab',
                         font=('Arial', 16, 'bold'),
@@ -403,7 +402,7 @@ def refresh_homeworks():
     except FileNotFoundError:
         messagebox.showerror(title="File not found!", message="No data file has been found!")
     else:
-        row = 3
+        row = 4
         for subject in hw:
             # display items with show=true from HOMEWORK_LIST
             if hw[subject]['show'] is True:
@@ -468,7 +467,8 @@ def show_todos():
         Label(todo_tab, text=f'{a_title}', font=FONT).grid(row=row, column=0)  # title
         Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK).grid(
             row=row, column=1)
-        
+        row += 1
+        ttk.Separator(todo_tab, orient=HORIZONTAL).grid(row=row, column=0, columnspan=4, sticky='ew')
         row += 1
 
 
@@ -597,7 +597,7 @@ if LOGGED_IN:
     window = Tk()
     window.quit()
     
-    window.geometry("900x500+300+200")
+    window.geometry("1200x600+300+200")
     window.title(string="Homework Aid")
     
     # global WIDGETS so that they can be READ/DESTROYED anywhere in the code
@@ -654,6 +654,7 @@ if LOGGED_IN:
                                                                                                             column=2)
     Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
                                                                                                          column=4)
+    ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
     refresh_homeworks()
     
     # todo_tab
@@ -662,11 +663,5 @@ if LOGGED_IN:
                                 background='white', borderwidth=0)
     todo_create_button.grid(row=0, column=2)
     show_todos()
-    
-    
-    
-    
-    
-    
     
     window.mainloop()
