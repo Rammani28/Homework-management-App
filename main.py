@@ -26,6 +26,7 @@ note_column = 0
 LOGGED_IN = False
 USERNAME: str = 'ram'
 
+
 # USERNAME = 'ram'  # TODO remove this line and use above line
 # LOGGED_IN = True  # TODO remove this line and use above line
 
@@ -254,7 +255,7 @@ def login_screen():
     
     xc = 100
     yc = 100
-
+    
     main_window = Tk()
     main_window.title('Homework Aid main window')
     main_window.configure(bg=WHITE)
@@ -303,8 +304,9 @@ def login_screen():
         x=200, y=yc + 350)
     
     Button(login_frame, text="About", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
-           highlightthickness=0, command=show_about,padx = 10,pady = 10).place(y=20, x=350)
+           highlightthickness=0, command=show_about, padx=10, pady=10).place(y=20, x=350)
     main_window.mainloop()
+
 
 # ----------------------------- CREATE FIVE TABS ------------------------------ #
 
@@ -421,7 +423,8 @@ def refresh_homeworks():
                     row=row, column=2)
                 Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(
                     row=row, column=4)
-                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18), command=lambda: delete_hw(USERNAME, f"{hw[subject]}", hw[subject]['id']))
+                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18),
+                                   command=lambda: delete_hw(USERNAME, f"{hw[subject]}", hw[subject]['id']))
                 delButton.grid(row=row, column=5, padx=(5, 5))
                 row += 1
 
@@ -537,27 +540,62 @@ def save_todo():
         messagebox.showinfo(title='Todo Added', message='Todo has been created.')
         temp_frame.destroy()
         show_todos()
-def n_on_leave(event):
-    note_text_data = text_box.get(index1=1.0,index2='end')
 
+
+def n_on_leave(event):
+    note_text_data = text_box.get(index1=1.0, index2='end')
+    
     if note_text_data == '':
         print('a')
-        text_box.insert(0,'enter a note')
+        text_box.insert(0, 'enter a note')
 
-def create_note():
-    global note_row,note_column,text_box
-    note_frame = Frame(notes_tab)
-    note_frame.configure(height=250, width=200, bg=LIGHT_YELLOW)
-    note_frame.grid(row = note_row,column = note_column,padx = 10,pady = 10)
-    text_box = Text(note_frame,font = FONT,width = 15,height = 9,border =0,bg=LIGHT_YELLOW)
-    text_box.bind('<Return>',n_on_leave)
-    text_box.grid() 
+
+all_notes = []
+
+
+class Note:
+    def __init__(self, row: int, column: int):
+        self.text = None
+        self.frame = Frame(notes_tab)
+        self.frame.configure(height=250, width=200)
+        self.frame.grid(row=row, column=column, padx=15, pady=10)
+        
+        self.text_box = Text(self.frame, font=FONT, width=20, height=9, bg=LIGHT_YELLOW, pady=25, padx=3,
+                             selectbackground=BLUE, wrap=WORD)
+        self.text_box.focus()
+        self.text_box.grid(row=row, column=column)
+        
+        self.del_button = Button(self.frame, text="X", fg=BLACK, bg=RED, cursor='hand1',
+                                 command=self.delete)
+        # self.del_button.tkraise()
+        self.del_button.grid(row=row, column=column, sticky="en")
+        
+        self.save_button = Button(self.frame, text="Save", command=self.save, cursor='hand1', bg=LIGHT_YELLOW)
+        self.save_button.grid(row=row, column=column, sticky='s')
+    
+    def save(self):
+        self.text = self.text_box.get(index1=1.0, index2='end')
+        print(self.text)
+        
+    def delete(self):
+        global note_row
+        self.frame.destroy()
+        if note_row > 0:
+            note_row -= 1
+
+
+def create_note_box():
+    global note_row, note_column
+    
+    new_note = Note(row=note_row, column=note_column)
+    all_notes.append(new_note)
+    
     note_column = note_column + 1
-    if note_column == 4 :
+    note_column %= 3
+    if note_column == 0:
         note_row = note_row + 1
         note_column = 0
 
-    pass
 
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
@@ -691,7 +729,8 @@ if LOGGED_IN:
     show_todos()
     
     # note tab  
-    Label(notes_tab,text = "Create Note ",font = FONT,bg = LIGHT_GREEN,fg = BLACK,).grid(row = 0,column = 0)
-    Button(notes_tab,text = '+',cursor = 'hand1',bg = BLUE,fg = BLACK,font = '24',command = create_note).grid(row = 0, column = 1,sticky = W)
+    # Label(notes_tab, text="Create Note ", font=FONT, bg=LIGHT_GREEN, fg=BLACK).grid(row=0, column=0, sticky='nw')
+    Button(notes_tab, text='New Note', cursor='hand1', bg=BLUE, fg=BLACK, font='24',
+           command=create_note_box).grid(row=0, column=0, sticky='n', padx=20)
     
     window.mainloop()
