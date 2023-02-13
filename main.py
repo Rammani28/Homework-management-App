@@ -3,13 +3,16 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import Calendar
+from PIL import Image, ImageTk
 from todo import Todo
 from sort import sort_hw
 from delete import delete_hw
+from formatted_img import *
+
 
 # ------------------------------- CONSTANTS ----------------------------------- #
 
-FONT = ("Arial", 16, 'normal')
+FONT = ("Arial", 17, 'normal')
 FONT_LOGIN = ('Noto Sans Canadian Aboriginal', 25, 'bold')
 DUE_HW_COUNTER = 0
 PASSWORD_LEN = 2
@@ -23,12 +26,11 @@ LIGHT_YELLOW = '#ffff66'
 note_row = 1
 note_column = 0
 
+USERNAME = 'ram'  # TODO remove this line and use above line
+LOGGED_IN = True  # TODO remove this line and use above line
+
 LOGGED_IN = False
 USERNAME: str = 'ram'
-
-
-# USERNAME = 'ram'  # TODO remove this line and use above line
-# LOGGED_IN = True  # TODO remove this line and use above line
 
 
 # --------------------------------- STYLES ------------------------------------#
@@ -79,8 +81,9 @@ def show_about():
     global about_frame, main_window
     about_frame = Frame(main_window, width=500, height=500, bg=WHITE)
     about_frame.place(x=440, y=0)
-    Button(about_frame, text="Back", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
-           highlightthickness=0, command=go_back).place(y=20, x=350)
+    
+    Button(about_frame, text="Back", bd=10, fg=WHITE, bg="light green", cursor='hand2',pady=10, padx=15,
+           font=("Arial", 14, "bold"), highlightthickness=0, command=go_back).place(y=20, x=385)
     
     Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
     Label(about_frame, text=' S Sonim\n M Aashiq Kumar\n A Rammani\n M Mandeep', fg=BLACK, bg=WHITE,
@@ -216,15 +219,23 @@ def signup_screen():
                                    font=('Noto Sans Myanmar UI', 11),
                                    textvariable=confirm_password, show='*')
     confirm_password_entry.place(x=xc, y=yc + 260)
+
+    signup_btn_img = signup_btn_image()
+
+    # Store the image object in a global variable, so it is not garbage collected by python's memory manager
     
-    signup_button = Button(signup_frame, text="Sign Up",
+    global signup_btn_img2
+    signup_btn_img2 = signup_btn_img
+
+    signup_button = Button(signup_frame, image=signup_btn_img2, font=FONT,
                            command=lambda: signup(s_username, s_password, confirm_password),
                            pady=7,
                            bg='#57a1f8',
                            fg='white',
                            border=0,
                            cursor='hand2')
-    signup_button.place(x=xc + 100, y=yc + 350)
+    signup_button.place(x=xc + 70, y=yc + 310)
+
     Button(signup_frame, text="Back", bd=0, fg=WHITE, bg=LIGHT_GREEN, cursor="hand2", font=FONT, highlightthickness=0,
            command=signup_frame.destroy).place(x=350, y=20)
 
@@ -274,7 +285,7 @@ def login_screen():
     l_username = StringVar(main_window)
     l_password = StringVar(main_window)
     
-    Label(login_frame, text='Username', font=FONT, bg='white').place(x=xc + 80, y=yc + 50)
+    Label(login_frame, text='Username', font=FONT, bg='white').place(x=xc + 65, y=yc + 50)
     l_username_entry = Entry(login_frame, width=25, fg='black', border=0, bg="white", font=('Noto Sans Myanmar UI', 11),
                              textvariable=l_username)
     l_username_entry.focus()
@@ -284,24 +295,28 @@ def login_screen():
     l_username_entry.bind('<FocusOut>', l_u_on_leave)
     
     password_label = Label(login_frame, text='Password', font=FONT, bg='white')
-    password_label.place(x=182, y=yc + 120 + 10)
+    password_label.place(x=170, y=yc + 120 + 10)
     
     l_password_entry = Entry(login_frame, width=25, fg='black', border=0, bg='white', font=('Noto Sans Myanmar UI', 11),
                              textvariable=l_password, show='*')
     l_password_entry.bind('<FocusIn>', l_p_on_enter)
     l_password_entry.place(x=100, y=yc + 160 + 10)
     
-    login_button = Button(login_frame, pady=7, text="login", bg='#57a1f8', fg='white', border=0, font=FONT,
+    login_btn_img = login_bth_image()
+    login_button = Button(login_frame, pady=7, image=login_btn_img, bg=WHITE, fg='white', border=0, borderwidth=0,
+                          highlightthickness=0, highlightcolor=WHITE,
                           cursor='hand1',
                           command=lambda: login(l_username, l_password))
-    login_button.place(x=190, y=yc + 200 + 10)
+    login_button.place(x=170, y=yc + 200 + 10)
     
-    Label(login_frame, text="Don't have an account?", fg='black', bg='white', font=('Noto Sans Myanmar UI', 15)).place(
-        x=130,
-        y=yc + 310)
-    Button(login_frame, text='Sign up', border=0, bg='white', cursor='hand1', fg='#57a1f8',
+    Label(login_frame, text="Do not have an account?", fg='black', bg='white', font=('Noto Sans Myanmar UI', 15)).place(
+        x=122,
+        y=yc + 285)
+    signup_btn_img = signup_btn_image()
+    Button(login_frame, image=signup_btn_img, border=0, borderwidth=0, highlightthickness=0, highlightcolor=WHITE,
+           bg=WHITE, cursor='hand1', fg='#57a1f8',
            command=signup_screen).place(
-        x=200, y=yc + 350)
+        x=172, y=yc + 335)
     
     Button(login_frame, text="About", bd=0, fg=WHITE, bg="light green", cursor='hand2', font=("Arial", 14, "bold"),
            highlightthickness=0, command=show_about, padx=10, pady=10).place(y=20, x=350)
@@ -423,8 +438,11 @@ def refresh_homeworks():
                     row=row, column=2)
                 Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(
                     row=row, column=4)
-                delButton = Button(assignments_tab, text=f"🗑", bg=WHITE, fg='red', font=('Arial', 18),
+                
+                global bin_img2
+                delButton = Button(assignments_tab, image=bin_img2, bg=WHITE, borderwidth=0, highlightthickness=0,
                                    command=lambda: delete_hw(USERNAME, f"{hw[subject]}", hw[subject]['id']))
+
                 delButton.grid(row=row, column=5, padx=(5, 5))
                 row += 1
 
@@ -551,6 +569,7 @@ def n_on_leave(event):
 
 
 all_notes = []
+position = 0
 
 
 class Note:
@@ -575,13 +594,12 @@ class Note:
     
     def save(self):
         self.text = self.text_box.get(index1=1.0, index2='end')
+        messagebox.showinfo(title="Saved", message=f"Note has been saved:\n{self.text}")
         print(self.text)
-        
+    
     def delete(self):
-        global note_row
+        global note_row, position, note_column
         self.frame.destroy()
-        if note_row > 0:
-            note_row -= 1
 
 
 def create_note_box():
@@ -685,6 +703,8 @@ if LOGGED_IN:
     temp_frame = Frame()
     about_frame = Frame()
     signup_frame = Frame()
+
+    bin_img2 = bin_img()
     
     style = ttk.Style(window)
     style.configure('TNotebook', background=WHITE, tabposition='wn')
@@ -732,5 +752,8 @@ if LOGGED_IN:
     # Label(notes_tab, text="Create Note ", font=FONT, bg=LIGHT_GREEN, fg=BLACK).grid(row=0, column=0, sticky='nw')
     Button(notes_tab, text='New Note', cursor='hand1', bg=BLUE, fg=BLACK, font='24',
            command=create_note_box).grid(row=0, column=0, sticky='n', padx=20)
+    
+    with open("data.json") as read_file:
+        pass
     
     window.mainloop()

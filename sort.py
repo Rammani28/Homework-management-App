@@ -19,5 +19,5 @@ def sort_hw(homework: dict):
             "id": homework[subject]["id"],
             "show": homework[subject]["show"]
         }
-    print(sorted_hw)
+    # print(sorted_hw)
     return sorted_hw
