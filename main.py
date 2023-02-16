@@ -663,7 +663,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-# login_screen()  # TODO Uncomment this line on completion of code
+login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
