@@ -1,14 +1,10 @@
 import json
 
 
-def delete_hw(user: str, subject: str, hw_id: int | str) -> None:
+def delete_hw(source_dict: dict, subject: str, id, button_index) -> None:
     
-    """deletes  a homework of specified user's specified subject with provided hw_id"""
+    """deletes a key with provided id from source dictionary"""
+    deleted_elem = source_dict['homework'].pop(subject, )
+    print(button_index)
     
-    with open('data.json') as read_file:
-        whole_data = json.load(read_file)
-        # whole_data.
     pass
-
-
-# removed_value = test_dict.pop('Mani')

@@ -3,16 +3,16 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import Calendar
-from PIL import Image, ImageTk
 from todo import Todo
+# from class_hw import Homework
 from sort import sort_hw
-from delete import delete_hw
+# from delete import delete_hw
 from formatted_img import *
-
 
 # ------------------------------- CONSTANTS ----------------------------------- #
 
 FONT = ("Arial", 17, 'normal')
+FONT_B = ("Arial", 26, "bold")
 FONT_LOGIN = ('Noto Sans Canadian Aboriginal', 25, 'bold')
 DUE_HW_COUNTER = 0
 PASSWORD_LEN = 2
@@ -26,14 +26,12 @@ LIGHT_YELLOW = '#ffff66'
 note_row = 1
 note_column = 0
 
-USERNAME = 'ram'  # TODO remove this line and use above line
-LOGGED_IN = True  # TODO remove this line and use above line
+# USERNAME = 'ram'  # TODO remove this line and use above line
+# LOGGED_IN = True  # TODO remove this line and use above line
+
 
 LOGGED_IN = False
 USERNAME: str = 'ram'
-
-
-# --------------------------------- STYLES ------------------------------------#
 
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
@@ -82,7 +80,7 @@ def show_about():
     about_frame = Frame(main_window, width=500, height=500, bg=WHITE)
     about_frame.place(x=440, y=0)
     
-    Button(about_frame, text="Back", bd=10, fg=WHITE, bg="light green", cursor='hand2',pady=10, padx=15,
+    Button(about_frame, text="Back", bd=10, fg=WHITE, bg="light green", cursor='hand2', pady=10, padx=15,
            font=("Arial", 14, "bold"), highlightthickness=0, command=go_back).place(y=20, x=385)
     
     Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
@@ -149,8 +147,10 @@ def signup(username_, password_, confirm_password_):
                 with open('data.json', mode='w') as write_file:
                     json.dump(complete_data, write_file, indent=4)
             except FileNotFoundError:
-                messagebox.showerror(title='FileNotFoundError!', message='data.json file seems to be deleted!')
-                pass
+                messagebox.showerror(
+                    title='FileNotFoundError!',
+                    message='data.json file seems to be empty.\n To solve the issue, add a set of curly braces ie {} '
+                            'inside data.json file')
     
     except FileNotFoundError:
         """Below code is for THE VERY FIRST sign up"""
@@ -158,13 +158,13 @@ def signup(username_, password_, confirm_password_):
         if len(password) < PASSWORD_LEN:
             messagebox.showerror(title='Too short password!',
                                  message=f'Password must be at least {PASSWORD_LEN} characters')
-            # signup_screen()
+        
         elif password != confirm_password:
             messagebox.showerror(title='Password did not Match',
                                  message='confirmation of new password failed, Enter same password at both fields ')
-            # signup_screen()
+        
         else:
-            # set_username_globally(username)
+            set_username_globally(username)
             new_user = {
                 f"{username}": {
                     'password': f"{password}"
@@ -197,8 +197,7 @@ def signup_screen():
     
     Label(signup_frame, text='Username', font=FONT, bg='white').place(x=xc + 68, y=yc + 50)
     s_username_entry = Entry(signup_frame, width=25, fg='black', border=0, bg="white",
-                             font=('Noto Sans Myanmar UI', 11),
-                             textvariable=s_username)
+                             font=('Noto Sans Myanmar UI', 11), textvariable=s_username)
     s_username_entry.place(x=xc, y=yc + 90)
     s_username_entry.focus()
     
@@ -209,24 +208,21 @@ def signup_screen():
     Label(signup_frame, text='Password', font=FONT, bg='white').place(x=xc + 70, y=yc + 130)
     
     s_password_entry = Entry(signup_frame, width=25, fg='black', border=0, bg='white',
-                             font=('Noto Sans Myanmar UI', 11),
-                             textvariable=s_password, show='*')
+                             font=('Noto Sans Myanmar UI', 11), textvariable=s_password, show='*')
     s_password_entry.bind('<FocusIn>', s_p_on_enter)
     s_password_entry.place(x=100, y=yc + 170)
     
     Label(signup_frame, font=FONT, text='confirm password', bg='white').place(x=xc + 28, y=yc + 210)
     confirm_password_entry = Entry(signup_frame, width=25, fg='black', border=0, bg='white',
-                                   font=('Noto Sans Myanmar UI', 11),
-                                   textvariable=confirm_password, show='*')
+                                   font=('Noto Sans Myanmar UI', 11), textvariable=confirm_password, show='*')
     confirm_password_entry.place(x=xc, y=yc + 260)
-
-    signup_btn_img = signup_btn_image()
-
-    # Store the image object in a global variable, so it is not garbage collected by python's memory manager
     
+    
+    # Store the image object in a global variable, so it is not garbage collected by python's memory manager
+    signup_btn_img = signup_btn_image()
     global signup_btn_img2
     signup_btn_img2 = signup_btn_img
-
+    
     signup_button = Button(signup_frame, image=signup_btn_img2, font=FONT,
                            command=lambda: signup(s_username, s_password, confirm_password),
                            pady=7,
@@ -235,7 +231,7 @@ def signup_screen():
                            border=0,
                            cursor='hand2')
     signup_button.place(x=xc + 70, y=yc + 310)
-
+    
     Button(signup_frame, text="Back", bd=0, fg=WHITE, bg=LIGHT_GREEN, cursor="hand2", font=FONT, highlightthickness=0,
            command=signup_frame.destroy).place(x=350, y=20)
 
@@ -248,7 +244,6 @@ def login(username, password):
             login_data = json.load(login_file)
     except FileNotFoundError:
         messagebox.showinfo(title='Sign Up first!', message="Register by creating an account below")
-    
     else:
         for user in login_data:
             if username.get() == user and password.get() == login_data[user]['password']:
@@ -348,8 +343,8 @@ def create_six_tabs(nb):
     nb.add(tab3, text="      Notes  ")
     nb.add(tab4, text="    Todo  ")
     nb.add(tab5, text="Add Assignments", state='hidden')
-    nb.add(tab6, text="About", state='hidden')
-    nb.grid()
+    nb.add(tab6, text="New Todo", state='hidden')
+    nb.pack()
     nb.enable_traversal()
     # nb.configure()
     
@@ -414,8 +409,70 @@ def add_hw_button(tab_hw):
     Button(tab_hw, text="Save Homework", font=FONT, command=save_hw, cursor='hand1').grid(row=5, column=2)
 
 
+def show_headers():
+    create_hw_btn = Button(assignments_tab,
+                           text="Create homework",
+                           cursor='hand1',
+                           border=0, pady=7, borderwidth=0,
+                           fg=WHITE, bg=BLUE,
+                           font=FONT, command=lambda: add_hw_button(add_hw_tab)
+                           )
+    create_hw_btn.grid(row=0, column=2)
+    Label(assignments_tab, text="", font=FONT, fg=BLUE, bg=WHITE).grid(row=1, column=0, columnspan=4)
+    Label(assignments_tab, text="Due Homeworks", font=("Arial", 26, "bold"), padx=10, fg="#7286D3", bg=WHITE).grid(
+        row=0, column=0, columnspan=2)
+    Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
+                                                                                                        column=0)
+    Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
+                                                                                                         column=1)
+    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
+                                                                                                            column=2)
+    Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
+                                                                                                         column=3)
+    ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
+
+
+class HomeworkDisplay:
+    
+    def __init__(self, hw, subject, row, col):
+        self.status = Label(assignments_tab, text='Due', fg='red', font=FONT, bg=WHITE)
+        self.status.grid(row=row, column=col)
+        
+        self.subject = Label(assignments_tab, text=f"{subject}", wraplength=150, padx=10, font=FONT, bg=GREEN)
+        self.subject.grid(row=row, column=col + 1)
+        
+        self.description = Label(assignments_tab, text=f"{hw[subject]['description']}", width=35, wraplength=400,
+                                 padx=20, font=FONT, bg=RED)
+        self.description.grid(row=row, column=col + 2)
+        
+        self.due = Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, bg=WHITE)
+        self.due.grid(row=row, column=col + 3)
+        
+        self.delete_btn = Button(assignments_tab, text="delete")
+        self.delete_btn.configure(image=bin_image, bg=WHITE, borderwidth=0, highlightthickness=0,
+                                  command=self.hide)
+        self.delete_btn.grid(row=row, column=col + 4)
+        
+        # ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
+        
+        self.separator = ttk.Separator(assignments_tab, orient=HORIZONTAL)
+        self.separator.grid(row=row + 1, column=0, columnspan=6, sticky='ew')
+    
+    def hide(self):
+        self.status.destroy()
+        self.subject.destroy()
+        self.delete_btn.destroy()
+        self.description.destroy()
+        self.due.destroy()
+        self.separator.destroy()
+        pass
+
+
+every_shown_hw = []
+
+
 def refresh_homeworks():
-    global DUE_HW_COUNTER
+    global DUE_HW_COUNTER, bin_image, every_shown_hw
     try:
         with open("data.json") as read_file:
             hw = json.load(read_file)[f'{USERNAME}']['homework']
@@ -429,22 +486,9 @@ def refresh_homeworks():
             if hw[subject]['show'] is True:
                 DUE_HW_COUNTER += 1
                 
-                status_label = Label(assignments_tab, text='Due', fg='red', font=FONT, background=WHITE)
-                status_label.grid(row=row, column=0)
-                if hw[subject]['completed'] is True:
-                    status_label.configure(text='Completed', fg=GREEN, background=WHITE)
-                Label(assignments_tab, text=f"{subject}", padx=10, font=FONT, background=WHITE).grid(row=row, column=1)
-                Label(assignments_tab, text=f"{hw[subject]['description']}", padx=20, font=FONT, background=WHITE).grid(
-                    row=row, column=2)
-                Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, background=WHITE).grid(
-                    row=row, column=4)
-                
-                global bin_img2
-                delButton = Button(assignments_tab, image=bin_img2, bg=WHITE, borderwidth=0, highlightthickness=0,
-                                   command=lambda: delete_hw(USERNAME, f"{hw[subject]}", hw[subject]['id']))
-
-                delButton.grid(row=row, column=5, padx=(5, 5))
-                row += 1
+                x = HomeworkDisplay(hw, subject, row, col=0)
+                every_shown_hw.append(x)
+                row += 2
 
 
 def save_hw():
@@ -481,6 +525,8 @@ def save_hw():
         
         notebook.tab(add_hw_tab, state='hidden')
         notebook.select(assignments_tab)
+        for label in every_shown_hw:
+            label.hide()
         refresh_homeworks()
 
 
@@ -569,7 +615,6 @@ def n_on_leave(event):
 
 
 all_notes = []
-position = 0
 
 
 class Note:
@@ -592,13 +637,13 @@ class Note:
         self.save_button = Button(self.frame, text="Save", command=self.save, cursor='hand1', bg=LIGHT_YELLOW)
         self.save_button.grid(row=row, column=column, sticky='s')
     
-    def save(self):
+    def save(self, ):
         self.text = self.text_box.get(index1=1.0, index2='end')
         messagebox.showinfo(title="Saved", message=f"Note has been saved:\n{self.text}")
         print(self.text)
     
     def delete(self):
-        global note_row, position, note_column
+        global note_row, note_column
         self.frame.destroy()
 
 
@@ -618,7 +663,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-login_screen()  # TODO Uncomment this line on completion of code
+# login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -703,8 +748,8 @@ if LOGGED_IN:
     temp_frame = Frame()
     about_frame = Frame()
     signup_frame = Frame()
-
-    bin_img2 = bin_img()
+    
+    bin_image = bin_img()
     
     style = ttk.Style(window)
     style.configure('TNotebook', background=WHITE, tabposition='wn')
@@ -714,31 +759,13 @@ if LOGGED_IN:
     dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab, add_todo_tab = all_tabs
     
     # DASH TAB
-    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE).grid(row=1,
-                                                                                                                  column=1)
+    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE) \
+        .grid(row=1, column=1)
     Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(
         row=2, column=1)
     
     # ASSIGNMENT TAB
-    Button(assignments_tab,
-           text="Create homework",
-           cursor='hand1',
-           border=0, pady=7,
-           fg=WHITE, bg=BLUE,
-           font=FONT, command=lambda: add_hw_button(add_hw_tab)
-           ).grid(row=0, column=2)
-    Label(assignments_tab, text="", font=FONT, fg=BLUE, bg=WHITE).grid(row=1, column=0, columnspan=4)
-    Label(assignments_tab, text="Due Homeworks", font=("Arial", 26, "bold"), padx=10, fg="#7286D3", bg=WHITE).grid(
-        row=0,
-        column=0)
-    Label(assignments_tab, text=" Status ", padx=5, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2, column=0)
-    Label(assignments_tab, text="Subjects", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
-                                                                                                         column=1)
-    Label(assignments_tab, text="Description", padx=20, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
-                                                                                                            column=2)
-    Label(assignments_tab, text="Due Date", padx=10, font=("Arial", 16, "bold"), bg=BLUE, fg=WHITE).grid(row=2,
-                                                                                                         column=4)
-    ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
+    show_headers()
     refresh_homeworks()
     
     # todo_tab

@@ -7,17 +7,15 @@
 #
 #
 #
-# Import Module
+
+# # TAKEAWAY: YOU NEED TO HAVE AN ACTIVE REFERENCE TO THE IMAGE IN MEMORY, OTHERWISE PYTHON GARBAGE COLLECTOR WILL
+# # DESTROY IT, AND IT WON'T BE DISPLAYED ON THE SCREEN
 from tkinter import *
 from PIL import Image, ImageTk
 
 
 def bin_img():
-    login_bth_img = Image.open("images/bin.png")
-    
-    
-    resize_image = login_bth_img.resize((100, 100))
-    
+    login_btn_img = Image.open("images/bin.png")
+    resize_image = login_btn_img.resize((100, 100))
     img = ImageTk.PhotoImage(resize_image)
-    
     return img

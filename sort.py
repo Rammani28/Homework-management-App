@@ -7,7 +7,6 @@ def sort_hw(homework: dict):
         details["date"] = due_date
     
     sorted_subjects = sorted(homework.keys(), key=lambda x: homework[x]["due"], reverse=False)
-    print(sorted_subjects)
     
     sorted_hw = {}
     for subject in sorted_subjects:

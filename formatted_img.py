@@ -3,8 +3,8 @@ from tkinter import PhotoImage
 
 
 def bin_img():
-    login_bth_img = Image.open("images/bin.png")
-    resize_image = login_bth_img.resize((30, 30))
+    login_btn_img = Image.open("images/bin.png")
+    resize_image = login_btn_img.resize((30, 30))
     img = ImageTk.PhotoImage(resize_image)
     return img
 
