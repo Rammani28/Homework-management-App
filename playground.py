@@ -19,3 +19,4 @@ def bin_img():
     resize_image = login_btn_img.resize((100, 100))
     img = ImageTk.PhotoImage(resize_image)
     return img
+

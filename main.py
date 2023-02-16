@@ -80,7 +80,7 @@ def show_about():
     about_frame = Frame(main_window, width=500, height=500, bg=WHITE)
     about_frame.place(x=440, y=0)
     
-    Button(about_frame, text="Back", bd=10, fg=WHITE, bg="light green", cursor='hand2', pady=10, padx=15,
+    Button(about_frame, text="Back", bd=0, fg=WHITE, bg="light green", cursor='hand2', pady=10, padx=15,
            font=("Arial", 14, "bold"), highlightthickness=0, command=go_back).place(y=20, x=385)
     
     Label(about_frame, text="Creators", font=("Courier", 20, "bold"), fg=BLACK, bg=WHITE).place(x=200, y=90)
