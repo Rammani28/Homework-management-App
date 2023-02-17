@@ -26,15 +26,36 @@ LIGHT_YELLOW = '#ffff66'
 note_row = 1
 note_column = 0
 
-# USERNAME = 'ram'  # TODO remove this line and use above line
-# LOGGED_IN = True  # TODO remove this line and use above line
+USERNAME = 'ram'  # TODO remove this line and use above line
+LOGGED_IN = True  # TODO remove this line and use above line
 
-
-LOGGED_IN = False
-USERNAME: str = 'ram'
-
+# LOGGED_IN = False
+# USERNAME: str = 'ram'
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
+
+word_list = []
+
+
+def get_label_text(frame):
+    label_text = []
+    for widget in frame.grid_slaves():
+        if isinstance(widget, Label) or isinstance(widget, Button):
+            text = widget.cget("text").strip(' ').lower()
+            text = text.split()
+            label_text.extend(text)
+    return label_text
+
+
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if str(arr[j]) < str(arr[min_idx]):
+                min_idx = j
+        (arr[i], arr[min_idx]) = (arr[min_idx], arr[i])
+    return arr
 
 
 def set_username_globally(var: str):
@@ -217,7 +238,6 @@ def signup_screen():
                                    font=('Noto Sans Myanmar UI', 11), textvariable=confirm_password, show='*')
     confirm_password_entry.place(x=xc, y=yc + 260)
     
-    
     # Store the image object in a global variable, so it is not garbage collected by python's memory manager
     signup_btn_img = signup_btn_image()
     global signup_btn_img2
@@ -322,12 +342,12 @@ def login_screen():
 
 
 def create_six_tabs(nb):
-    tab1 = ttk.Frame(nb, width=1200, height=600)
-    tab2 = ttk.Frame(nb, width=1200, height=600)
-    tab3 = ttk.Frame(nb, width=1200, height=600)
-    tab4 = ttk.Frame(nb, width=1200, height=600)
-    tab5 = ttk.Frame(nb, width=1200, height=600)
-    tab6 = ttk.Frame(nb, width=1200, height=600)
+    tab1 = ttk.Frame(nb)
+    tab2 = ttk.Frame(nb)
+    tab3 = ttk.Frame(nb)
+    tab4 = ttk.Frame(nb)
+    tab5 = ttk.Frame(nb)
+    tab6 = ttk.Frame(nb)
     tab_style = ttk.Style()
     tab_style.configure('TNotebook.Tab',
                         font=('Arial', 16, 'bold'),
@@ -335,7 +355,6 @@ def create_six_tabs(nb):
                         background=BLUE,
                         width=15,
                         padding=(5, 10, 5, 10))
-    
     tab_style.configure("TFrame", background=WHITE, foreground=BLACK, width=900, height=900)
     
     nb.add(tab1, text="    Dashboard  ")
@@ -344,9 +363,8 @@ def create_six_tabs(nb):
     nb.add(tab4, text="    Todo  ")
     nb.add(tab5, text="Add Assignments", state='hidden')
     nb.add(tab6, text="New Todo", state='hidden')
-    nb.pack()
+    nb.pack(fill="both", expand=True)
     nb.enable_traversal()
-    # nb.configure()
     
     return tab1, tab2, tab3, tab4, tab5, tab6
 
@@ -663,7 +681,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-login_screen()  # TODO Uncomment this line on completion of code
+# login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -758,12 +776,6 @@ if LOGGED_IN:
     all_tabs = create_six_tabs(notebook)
     dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab, add_todo_tab = all_tabs
     
-    # DASH TAB
-    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE) \
-        .grid(row=1, column=1)
-    Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(
-        row=2, column=1)
-    
     # ASSIGNMENT TAB
     show_headers()
     refresh_homeworks()
@@ -776,11 +788,54 @@ if LOGGED_IN:
     show_todos()
     
     # note tab  
-    # Label(notes_tab, text="Create Note ", font=FONT, bg=LIGHT_GREEN, fg=BLACK).grid(row=0, column=0, sticky='nw')
     Button(notes_tab, text='New Note', cursor='hand1', bg=BLUE, fg=BLACK, font='24',
            command=create_note_box).grid(row=0, column=0, sticky='n', padx=20)
     
-    with open("data.json") as read_file:
-        pass
+    # DASH TAB
+    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=RED) \
+        .grid(row=1, column=1)
+    Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(
+        row=2, column=1)
+    search_box = Entry(dash_tab, width=30, font=FONT)
+    search_box.grid(row=1, column=3, padx=100)
+    search_box.focus()
+    
+    # word finder
+    
+    assignment_words = (get_label_text(assignments_tab))
+    dash_words = (get_label_text(dash_tab))
+    todo_words = (get_label_text(todo_tab))
+    note_words = (get_label_text(notes_tab))
+    
+    dash_words = selection_sort(dash_words)
+    todo_words = selection_sort(todo_words)
+    assignment_words = selection_sort(assignment_words)
+    note_words = selection_sort(note_words)
+    
+    
+    def find(word, *word_lists):
+        found = False
+        print(word_lists[0])
+        if word in word_lists[0]:
+            print(f"{word} found in dash")
+            found = True
+        if word in word_lists[1]:
+            print(f"{word} found in assignment")
+            found = True
+        if word in word_lists[2]:
+            print(f"{word} found in todo")
+            found = True
+        if word in word_lists[3]:
+            print(f"{word} found in notes")
+            found = True
+        if not found:
+            print(f"{word}not found")
+    
+    
+    words = (dash_words, assignment_words, todo_words, note_words)
+    Button(dash_tab, text="Search", font=FONT, cursor='hand1', bg=GREEN,
+           command=lambda: find(search_box.get(), words)).grid(row=2, column=3, pady=20)
+    
+    # print(dash_words)
     
     window.mainloop()
