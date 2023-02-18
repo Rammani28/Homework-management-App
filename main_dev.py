@@ -26,11 +26,11 @@ LIGHT_YELLOW = '#ffff66'
 note_row = 1
 note_column = 0
 
-# USERNAME = 'ram'  # TODO remove this line and use above line
-# LOGGED_IN = True  # TODO remove this line and use above line
+USERNAME = 'ram'  # TODO remove this line and use above line
+LOGGED_IN = True  # TODO remove this line and use above line
 
-LOGGED_IN = False
-USERNAME: str = 'ram'
+# LOGGED_IN = False
+# USERNAME: str = 'ram'
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
 
@@ -41,7 +41,7 @@ def get_label_text(frame):
     label_text = []
     for widget in frame.grid_slaves():
         if isinstance(widget, Label) or isinstance(widget, Button):
-            text = widget.cget("text").strip(' ').lower()
+            text = widget.cget("text").strip(' ')
             text = text.split()
             label_text.extend(text)
     return label_text
@@ -51,13 +51,15 @@ def selection_sort(arr):
     n = len(arr)
     for i in range(n):
         min_idx = i
-        for j in range(i + 1, n):
+        
+        for j in range(i+1, n):
             if str(arr[j]) < str(arr[min_idx]):
                 min_idx = j
+
         (arr[i], arr[min_idx]) = (arr[min_idx], arr[i])
     return arr
-
-
+    
+    
 def set_username_globally(var: str):
     global USERNAME
     USERNAME = var
@@ -342,12 +344,12 @@ def login_screen():
 
 
 def create_six_tabs(nb):
-    tab1 = ttk.Frame(nb)
-    tab2 = ttk.Frame(nb)
-    tab3 = ttk.Frame(nb)
-    tab4 = ttk.Frame(nb)
-    tab5 = ttk.Frame(nb)
-    tab6 = ttk.Frame(nb)
+    tab1 = ttk.Frame(nb, width=1200, height=600)
+    tab2 = ttk.Frame(nb, width=1200, height=600)
+    tab3 = ttk.Frame(nb, width=1200, height=600)
+    tab4 = ttk.Frame(nb, width=1200, height=600)
+    tab5 = ttk.Frame(nb, width=1200, height=600)
+    tab6 = ttk.Frame(nb, width=1200, height=600)
     tab_style = ttk.Style()
     tab_style.configure('TNotebook.Tab',
                         font=('Arial', 16, 'bold'),
@@ -355,6 +357,7 @@ def create_six_tabs(nb):
                         background=BLUE,
                         width=15,
                         padding=(5, 10, 5, 10))
+    
     tab_style.configure("TFrame", background=WHITE, foreground=BLACK, width=900, height=900)
     
     nb.add(tab1, text="    Dashboard  ")
@@ -363,8 +366,9 @@ def create_six_tabs(nb):
     nb.add(tab4, text="    Todo  ")
     nb.add(tab5, text="Add Assignments", state='hidden')
     nb.add(tab6, text="New Todo", state='hidden')
-    nb.pack(fill="both", expand=True)
+    nb.pack()
     nb.enable_traversal()
+    # nb.configure()
     
     return tab1, tab2, tab3, tab4, tab5, tab6
 
@@ -466,11 +470,9 @@ class HomeworkDisplay:
         self.due = Label(assignments_tab, text=f"{hw[subject]['due_date']}", padx=10, font=FONT, bg=WHITE)
         self.due.grid(row=row, column=col + 3)
         
-        if hw[subject]['completed'] is True:
-            self.status.configure(text="Completed", fg=GREEN)
-        
         self.delete_btn = Button(assignments_tab, text="delete")
-        self.delete_btn.configure(image=bin_image, bg=WHITE, borderwidth=0, highlightthickness=0, command=self.hide)
+        self.delete_btn.configure(image=bin_image, bg=WHITE, borderwidth=0, highlightthickness=0,
+                                  command=self.hide)
         self.delete_btn.grid(row=row, column=col + 4)
         
         # ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
@@ -555,7 +557,7 @@ def show_todos():
         todos = json.load(read_file)[f"{USERNAME}"]['todo']
     row = 2
     for a_title in todos:
-        Label(todo_tab, text=f'{a_title}', font=FONT, bg=WHITE).grid(row=row, column=0)  # title
+        Label(todo_tab, text=f'{a_title}', font=FONT).grid(row=row, column=0)  # title
         Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK).grid(
             row=row, column=1)
         row += 1
@@ -623,10 +625,6 @@ def save_todo():
             json.dump(complete_data, write_file, indent=4)
         messagebox.showinfo(title='Todo Added', message='Todo has been created.')
         
-        todo_content_entry.delete(1.0, END)
-        todo_title_entry.delete(0, END)
-        notebook.tab(add_todo_tab, state='hidden')
-        notebook.select(todo_tab)
         show_todos()
 
 
@@ -639,14 +637,11 @@ def n_on_leave(event):
 
 
 all_notes = []
-note_id = 100
+
 
 class Note:
     def __init__(self, row: int, column: int):
         self.text = None
-        self.key = None
-        self.new_note = None
-        self.i = 0
         self.frame = Frame(notes_tab)
         self.frame.configure(height=250, width=200)
         self.frame.grid(row=row, column=column, padx=15, pady=10)
@@ -656,45 +651,23 @@ class Note:
         self.text_box.focus()
         self.text_box.grid(row=row, column=column)
         
-        self.close_button = Button(self.frame, text="X", fg=BLACK, bg=RED, cursor='hand1',
-                                   command=self.close)
+        self.del_button = Button(self.frame, text="X", fg=BLACK, bg=RED, cursor='hand1',
+                                 command=self.delete)
         # self.del_button.tkraise()
-        self.close_button.grid(row=row, column=column, sticky="en")
+        self.del_button.grid(row=row, column=column, sticky="en")
         
-        self.save_button = Button(self.frame, text="Save", command=lambda:self.save(USERNAME), cursor='hand1', bg=LIGHT_YELLOW)
+        self.save_button = Button(self.frame, text="Save", command=self.save, cursor='hand1', bg=LIGHT_YELLOW)
         self.save_button.grid(row=row, column=column, sticky='s')
-        
-        self.del_button = Button(self.frame, text="Delete", command=self.delete, cursor='hand1', bg=LIGHT_YELLOW)
-        self.del_button.grid(row=row, column=column, sticky='se')
     
-    def save(self, user):
-        self.text = self.text_box.get(index1=1.0, index2='end').strip()
-        if len(self.text.strip('\n')) > 0:
-            if self.i == 0:
-                self.key = f"{self.text}"
-                self.i += 1
-            
-            with open('data.json') as read_file:
-                whole_data: dict = json.load(read_file)
-            user_notes = whole_data[f"{user}"]['notes']
-            # self.new_note = {
-            #     self.key: {
-            #         "content": f"{self.text_box.get(index1=1.0, index2='end')}"
-            #     }
-            # }
-            user_notes[self.key] = f"{self.text_box.get(index1=1.0, index2='end')}"
-            messagebox.showinfo(title="Saved", parent=notes_tab, message=f"Note has been saved:\n{self.text}")
-
-        
+    def save(self, ):
+        self.text = self.text_box.get(index1=1.0, index2='end')
+        messagebox.showinfo(title="Saved", message=f"Note has been saved:\n{self.text}")
+        print(self.text)
+    
     def delete(self):
-        pass
-    
-    def close(self):
         global note_row, note_column
         self.frame.destroy()
-        
-    # def show_message(self):
-    #     messagebox.showinfo(title="Saved", parent=self.frame, message=f"Note has been saved:\n{self.text}")
+
 
 def create_note_box():
     global note_row, note_column
@@ -712,7 +685,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-login_screen()  # TODO Uncomment this line on completion of code
+# login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -807,90 +780,36 @@ if LOGGED_IN:
     all_tabs = create_six_tabs(notebook)
     dash_tab, assignments_tab, notes_tab, todo_tab, add_hw_tab, add_todo_tab = all_tabs
     
+    # DASH TAB
+    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=WHITE) \
+        .grid(row=1, column=1)
+    Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(
+        row=2, column=1)
+    
     # ASSIGNMENT TAB
     show_headers()
     refresh_homeworks()
     
     # todo_tab
-    Label(todo_tab, text="Anything you want to do later? Add them here.",bg=WHITE, font=FONT).grid(row=0, column=0, columnspan=2)
+    Label(todo_tab, text="Anything you want to do later? Add them here.", font=FONT).grid(row=0, column=0, columnspan=2)
     todo_create_button = Button(todo_tab, text="Create", command=create_todo, cursor='hand1', font=FONT,
                                 background='white', borderwidth=0)
     todo_create_button.grid(row=0, column=2)
-    ttk.Separator()
     show_todos()
     
-    # note tab  
+    # note tab
+    # Label(notes_tab, text="Create Note ", font=FONT, bg=LIGHT_GREEN, fg=BLACK).grid(row=0, column=0, sticky='nw')
     Button(notes_tab, text='New Note', cursor='hand1', bg=BLUE, fg=BLACK, font='24',
            command=create_note_box).grid(row=0, column=0, sticky='n', padx=20)
-    
-    # DASH TAB
-    Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=RED) \
-        .grid(row=1, column=1)
-    Label(dash_tab, text=f"You have {DUE_HW_COUNTER} homeworks remaining", font=FONT, pady=10, background=WHITE).grid(
-        row=2, column=1)
-    search_box = Entry(dash_tab, width=30, font=FONT)
-    search_box.grid(row=1, column=3, padx=100)
-    search_box.focus()
     
     # word finder
     
     assignment_words = (get_label_text(assignments_tab))
+    print(assignment_words)
     dash_words = (get_label_text(dash_tab))
     todo_words = (get_label_text(todo_tab))
     note_words = (get_label_text(notes_tab))
     
-    dash_words = selection_sort(dash_words)
-    todo_words = selection_sort(todo_words)
-    assignment_words = selection_sort(assignment_words)
-    note_words = selection_sort(note_words)
-
-    def select_tab(tab_no):
-        notebook.select(tab_no)
-
-    frame = Frame(dash_tab)
     
-    def search_and_show(word, *word_lists):
-        global frame
-        found = False
-        for widget in frame.winfo_children():
-            widget.destroy()
-        frame.grid(row=3, column=3, columnspan=2)
-        tree = ttk.Treeview(frame)
-        #
-        # style = ttk.Style(assignments_tab)
-        # style.configure('Treeview', font=('arial', 16, 'bold'))
-        
-        tree.heading('#0', text="Result")
-    
-        if word in word_lists[0][0]:
-            tree.insert(parent='', index='end', iid=0, text=f"'{word}' found in dash")
-            found = True
-        if word in word_lists[0][1]:
-            tree.insert(parent='', index='end', iid=1, text=f"'{word}' found in assignment")
-            found = True
-        if word in word_lists[0][2]:
-            tree.insert(parent='', index='end', iid=3, text=f"'{word}' found in todo")
-            found = True
-        if word in word_lists[0][3]:
-            tree.insert(parent='', index='end', iid=2, text=f"'{word}' found in notes")
-            found = True
-        if not found:
-            tree.insert(parent='', index='end',iid=0, text=f"'{word}' not found.")
-    
-        def on_select(event):
-            item = tree.selection()[0]
-            select_tab(item)
-    
-        tree.pack()
-        tree.focus_set()
-        tree.selection_set(tree.get_children()[0])
-        tree.bind('<Return>', on_select)
-
-
-    words = (dash_words, assignment_words, todo_words, note_words)
-    Button(dash_tab, text="Search", font=FONT, cursor='hand1', bg=GREEN,
-           command=lambda: search_and_show(search_box.get(), words)).grid(row=2, column=3, pady=20)
-    
-    # print(dash_words)
     
     window.mainloop()
