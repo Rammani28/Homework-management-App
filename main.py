@@ -29,8 +29,8 @@ note_column = 0
 USERNAME = 'ram'  # TODO remove this line and use above line
 LOGGED_IN = True  # TODO remove this line and use above line
 
-# LOGGED_IN = False
-# USERNAME: str = 'ram'
+LOGGED_IN = False
+USERNAME: str = 'ram'
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
 
@@ -125,8 +125,12 @@ def signup(username_, password_, confirm_password_):
         
         with open("login.json") as login_file:
             login_data = json.load(login_file)
-        
-        if username in login_data:
+        # print(type(login_data))
+        users = []
+        for user in login_data.keys():
+            users.append((decode(user)))
+            
+        if username in users:
             messagebox.showerror(title='Username Error!',
                                  message='This username has been taken. Please chose another one.')
         
@@ -141,15 +145,15 @@ def signup(username_, password_, confirm_password_):
         else:
             # it is valid
             
-            # set_username_globally(username)
+            set_username_globally(username)
             messagebox.showinfo(title='Success',
                                 message=f"""Your account has been created
                                 \n username:{username}
                                 \npassword: {password}""")
             
             new_user = {
-                f"{username}": {
-                    "password": f"{password}"
+                encode(f"{username}"): {
+                    "password": encode(f"{password}")
                 }
             }
             login_data.update(new_user)
@@ -161,7 +165,7 @@ def signup(username_, password_, confirm_password_):
                     complete_data = json.load(read_file)
                 
                 current_user_data = {
-                    f"{USERNAME}": {
+                    decode(f"{USERNAME}"): {
                         "homework": {},
                         "todo": {},
                         "notes": {},
@@ -191,8 +195,8 @@ def signup(username_, password_, confirm_password_):
         else:
             set_username_globally(username)
             new_user = {
-                f"{username}": {
-                    'password': f"{password}"
+                encode(f"{username}"): {
+                    'password': encode(f"{password}")
                 }
             }
             with open("login.json", mode='w') as write_file:
@@ -264,18 +268,20 @@ def login(username, password):
     global LOGGED_IN, USERNAME, main_window
     
     try:
-        with open("login.json") as login_file:
-            login_data = json.load(login_file)
+        with open("login.json") as read_login_file:
+            login_data = json.load(read_login_file)
     except FileNotFoundError:
         messagebox.showinfo(title='Sign Up first!', message="Register by creating an account below")
     else:
         for user in login_data:
-            if username.get() == user and password.get() == login_data[user]['password']:
+            if username.get() == decode(f"{user}") and password.get() == decode(login_data[user]['password']):
+                print(decode(f"{user}"))
+                print(decode(f"{login_data[user]['password']}"))
                 LOGGED_IN = True
                 USERNAME = username.get()
                 main_window.destroy()
                 return
-        messagebox.showerror(title='Error', message='Invalid Username or Password! Try Again.')
+        messagebox.showerror(title='Error', message=f'Invalid Username {username.get()} or Password {password.get()}! Try Again.')
         main_window.destroy()
         login_screen()
 
@@ -533,7 +539,7 @@ def save_hw():
             "show": True
         }
     }
-    field_is_empty = len(subject) == 0 or len(description) == 0
+    field_is_empty = len(subject.strip()) == 0 or len(description.strip()) == 0 or len(due.strip())
     if field_is_empty:
         messagebox.showerror(title="EmptyFieldError!", message="Please don't leave any field empty.")
     else:
@@ -735,7 +741,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-# login_screen()  # TODO Uncomment this line on completion of code
+login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
