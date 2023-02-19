@@ -4,7 +4,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import Calendar
 from todo import Todo
-# from class_hw import Homework
+from cipher import encode, decode
 from sort import sort_hw
 # from delete import delete_hw
 from formatted_img import *
@@ -26,11 +26,11 @@ LIGHT_YELLOW = '#ffff66'
 note_row = 1
 note_column = 0
 
-# USERNAME = 'ram'  # TODO remove this line and use above line
-# LOGGED_IN = True  # TODO remove this line and use above line
+USERNAME = 'ram'  # TODO remove this line and use above line
+LOGGED_IN = True  # TODO remove this line and use above line
 
-LOGGED_IN = False
-USERNAME: str = 'ram'
+# LOGGED_IN = False
+# USERNAME: str = 'ram'
 
 # --------------------------------- LOGIN MANAGEMENT ------------------------------------#
 
@@ -61,6 +61,10 @@ def selection_sort(arr):
 def set_username_globally(var: str):
     global USERNAME
     USERNAME = var
+
+
+def quit_app(event):
+    window.destroy()
 
 
 def l_u_on_enter(event):
@@ -382,6 +386,7 @@ def insert_to_due_entry(date_picked):
 
 def pick_due_date():
     global calendar, confirm_date_button
+    hw_due_entry.configure(state='normal')
     date_picked = StringVar(add_hw_tab, Calendar.date.today().strftime("%y/%m/%d"))
     calendar = Calendar(
         add_hw_tab,
@@ -392,8 +397,8 @@ def pick_due_date():
     )
     confirm_date_button = Button(add_hw_tab, text='Confirm date', cursor='hand1',
                                  command=lambda: insert_to_due_entry(date_picked))
-    confirm_date_button.grid(row=4, column=5)
-    calendar.grid(row=4, column=3)
+    confirm_date_button.grid(row=6, column=3)
+    calendar.grid(row=5, column=3)
 
 
 def add_hw_button(tab_hw):
@@ -416,15 +421,15 @@ def add_hw_button(tab_hw):
     
     # 3rd row
     Label(tab_hw, text="Enter Due date", font=FONT, pady=10, padx=20).grid(row=3, column=1)
-    hw_due_entry = Entry(tab_hw, width=40, font=FONT)
+    hw_due_entry = Entry(tab_hw, width=40, font=FONT, state='readonly', readonlybackground=WHITE)
     hw_due_entry.grid(row=3, column=2)
     
     # the calendar emoji  🗓 doses not display correctly
-    pick_date_button = Button(tab_hw, text="📅Pick a date 🗓️", cursor='hand2', font=FONT, command=pick_due_date)
-    pick_date_button.grid(row=3, column=3)
+    pick_date_button = Button(tab_hw, text="📅Pick a date 🗓️", cursor='hand2', bg=WHITE, command=pick_due_date)
+    pick_date_button.grid(row=4, column=2)
     
     # save button
-    Button(tab_hw, text="Save Homework", font=FONT, command=save_hw, cursor='hand1').grid(row=5, column=2)
+    Button(tab_hw, text="Save Homework",bg=WHITE, font=FONT, command=save_hw, cursor='hand1').grid(row=5, column=2)
 
 
 def show_headers():
@@ -456,7 +461,7 @@ class HomeworkDisplay:
         self.status = Label(assignments_tab, text='Due', fg='red', font=FONT, bg=WHITE)
         self.status.grid(row=row, column=col)
         
-        self.subject = Label(assignments_tab, text=f"{subject}", wraplength=150, padx=10, font=FONT, bg=GREEN)
+        self.subject = Label(assignments_tab, text=f"{subject}", wraplength=150, padx=10, font=FONT, bg=WHITE)
         self.subject.grid(row=row, column=col + 1)
         
         self.description = Label(assignments_tab, text=f"{hw[subject]['description']}", width=35, wraplength=400,
@@ -472,8 +477,6 @@ class HomeworkDisplay:
         self.delete_btn = Button(assignments_tab, text="delete")
         self.delete_btn.configure(image=bin_image, bg=WHITE, borderwidth=0, highlightthickness=0, command=self.hide)
         self.delete_btn.grid(row=row, column=col + 4)
-        
-        # ttk.Separator(assignments_tab, orient=HORIZONTAL).grid(row=3, column=0, columnspan=6, sticky='ew')
         
         self.separator = ttk.Separator(assignments_tab, orient=HORIZONTAL)
         self.separator.grid(row=row + 1, column=0, columnspan=6, sticky='ew')
@@ -550,17 +553,27 @@ def save_hw():
         refresh_homeworks()
 
 
+def delete_widgets(title, desc, separator, del_btn):
+    title.destroy()
+    desc.destroy()
+    separator.destroy()
+    del_btn.destroy()
+
 def show_todos():
     with open('data.json') as read_file:
         todos = json.load(read_file)[f"{USERNAME}"]['todo']
     row = 2
     for a_title in todos:
-        Label(todo_tab, text=f'{a_title}', font=FONT, bg=WHITE).grid(row=row, column=0)  # title
-        Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK).grid(
-            row=row, column=1)
-        row += 1
-        ttk.Separator(todo_tab, orient=HORIZONTAL).grid(row=row, column=0, columnspan=4, sticky='ew')
-        row += 1
+        title = Label(todo_tab, text=f'{a_title}', font=FONT, bg=WHITE)
+        title.grid(row=row, column=0)  # title
+        desc = Label(todo_tab, text=f"{todos[a_title]['description']}", font=FONT, justify=LEFT, bg=WHITE, fg=BLACK)
+        desc.grid(row=row, column=1)
+        separator = ttk.Separator(todo_tab, orient=HORIZONTAL)
+        close_btn = Button()
+        close_btn = Button(todo_tab, text="Remove", font=FONT, bg=WHITE, command=lambda title=title, desc=desc, separator=separator, del_btn=close_btn: delete_widgets(title, desc, separator, close_btn))
+        close_btn.grid(row=row, column=2)
+        separator.grid(row=row+1, column=0, columnspan=4, sticky='ew')
+        row += 2
 
 
 def add_bullet_point(event):
@@ -648,25 +661,34 @@ class Note:
         self.new_note = None
         self.i = 0
         self.frame = Frame(notes_tab)
-        self.frame.configure(height=250, width=200)
+        self.frame.configure(height=260, width=200)
         self.frame.grid(row=row, column=column, padx=15, pady=10)
-        
-        self.text_box = Text(self.frame, font=FONT, width=20, height=9, bg=LIGHT_YELLOW, pady=25, padx=3,
+        self.sm_frame = Frame(self.frame, height=260, bg=GREEN)
+        self.sm_frame.grid(row=row, column=column + 1, sticky='ns')
+        self.sm_frame.grid_propagate(False)
+
+        self.scrollbar = Scrollbar(self.sm_frame, orient=VERTICAL)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+
+        self.text_box = Text(self.frame, font=FONT, width=20, height=9, undo=True, yscrollcommand=self.scrollbar.set,
+                             bg=LIGHT_YELLOW, pady=25, padx=3,
                              selectbackground=BLUE, wrap=WORD)
         self.text_box.focus()
-        self.text_box.grid(row=row, column=column)
-        
+        self.scrollbar.config(command=self.text_box.yview)
+        self.text_box.grid(row=row, column=column, sticky='nsew')
+
         self.close_button = Button(self.frame, text="X", fg=BLACK, bg=RED, cursor='hand1',
                                    command=self.close)
         # self.del_button.tkraise()
         self.close_button.grid(row=row, column=column, sticky="en")
-        
-        self.save_button = Button(self.frame, text="Save", command=lambda:self.save(USERNAME), cursor='hand1', bg=LIGHT_YELLOW)
+
+        self.save_button = Button(self.frame, text="Save", command=lambda: self.save(USERNAME), cursor='hand1',
+                                  bg=LIGHT_YELLOW)
         self.save_button.grid(row=row, column=column, sticky='s')
-        
+
         self.del_button = Button(self.frame, text="Delete", command=self.delete, cursor='hand1', bg=LIGHT_YELLOW)
         self.del_button.grid(row=row, column=column, sticky='se')
-    
+
     def save(self, user):
         self.text = self.text_box.get(index1=1.0, index2='end').strip()
         if len(self.text.strip('\n')) > 0:
@@ -683,6 +705,7 @@ class Note:
             #     }
             # }
             user_notes[self.key] = f"{self.text_box.get(index1=1.0, index2='end')}"
+            print(user_notes)
             messagebox.showinfo(title="Saved", parent=notes_tab, message=f"Note has been saved:\n{self.text}")
 
         
@@ -712,7 +735,7 @@ def create_note_box():
 # ---------------------------------- FILE HANDLING -------------------------------------- #
 
 
-login_screen()  # TODO Uncomment this line on completion of code
+# login_screen()  # TODO Uncomment this line on completion of code
 
 # todo_id and sub_id handling
 try:
@@ -770,6 +793,7 @@ if LOGGED_IN:
     
     window = Tk()
     window.quit()
+    window.bind('<Control-q>', quit_app)
     
     window.geometry("1200x600+300+200")
     window.title(string="Homework Aid")
@@ -816,12 +840,14 @@ if LOGGED_IN:
     todo_create_button = Button(todo_tab, text="Create", command=create_todo, cursor='hand1', font=FONT,
                                 background='white', borderwidth=0)
     todo_create_button.grid(row=0, column=2)
-    ttk.Separator()
+    ttk.Separator(todo_tab, orient=HORIZONTAL).grid(row=1, column=0, columnspan=6, sticky='ew')
     show_todos()
     
     # note tab  
     Button(notes_tab, text='New Note', cursor='hand1', bg=BLUE, fg=BLACK, font='24',
            command=create_note_box).grid(row=0, column=0, sticky='n', padx=20)
+    create_note_box()
+    create_note_box()
     
     # DASH TAB
     Label(dash_tab, text="Welcome to your HomeWork assistance system", font=FONT, pady=10, background=RED) \
@@ -847,19 +873,17 @@ if LOGGED_IN:
     def select_tab(tab_no):
         notebook.select(tab_no)
 
+
     frame = Frame(dash_tab)
+    
     
     def search_and_show(word, *word_lists):
         global frame
         found = False
         for widget in frame.winfo_children():
             widget.destroy()
-        frame.grid(row=3, column=3, columnspan=2)
+        frame.grid(row=4, column=3, columnspan=2)
         tree = ttk.Treeview(frame)
-        #
-        # style = ttk.Style(assignments_tab)
-        # style.configure('Treeview', font=('arial', 16, 'bold'))
-        
         tree.heading('#0', text="Result")
     
         if word in word_lists[0][0]:
@@ -875,7 +899,7 @@ if LOGGED_IN:
             tree.insert(parent='', index='end', iid=2, text=f"'{word}' found in notes")
             found = True
         if not found:
-            tree.insert(parent='', index='end',iid=0, text=f"'{word}' not found.")
+            tree.insert(parent='', index='end', iid=0, text=f"'{word}' not found.")
     
         def on_select(event):
             item = tree.selection()[0]
@@ -888,8 +912,9 @@ if LOGGED_IN:
 
 
     words = (dash_words, assignment_words, todo_words, note_words)
-    Button(dash_tab, text="Search", font=FONT, cursor='hand1', bg=GREEN,
-           command=lambda: search_and_show(search_box.get(), words)).grid(row=2, column=3, pady=20)
+    Label(dash_tab, text="Search for any word in this app", bg=WHITE).grid(row=2, column=3)
+    Button(dash_tab, text="Search", font=FONT, cursor='hand1', bg=BLUE,
+           command=lambda: search_and_show(search_box.get(), words)).grid(row=3, column=3, pady=20)
     
     # print(dash_words)
     
